@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#176b52">
+    <title>FoodCheck 1.0.8 – Prototyp</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+    :root {
+        --green: #176b52;
+        --mint: #e8f4ee;
+        --blue: #dcecf9;
+        --yellow: #fff1bd;
+        --red: #f9d9d8;
+        --ink: #1f2925;
+        --muted: #63716b;
+        --line: #dce4df
+    }
+
+    * {
+        box-sizing:border-box
+    }
+
+    body {
+        margin: 0;
+        background: #f5f7f5;
+        color: var(--ink);
+        font:16px/1.45 system-ui, -apple-system, Segoe UI, sans-serif
+    }
+
+    header {
+        background: var(--green);
+        color: white;
+        padding:22px 18px 18px
+    }
+
+    header h1 {
+        margin: 0;
+        font-size:28px
+    }
+
+    header p {
+        margin: 4px 0 0;
+        opacity:.9
+    }
+
+    .wrap {
+        max-width: 820px;
+        margin: auto;
+        padding:16px
+    }
+
+    .panel {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+        margin: 0 0 14px;
+        box-shadow:0 2px 10px #102b1710
+    }
+
+    .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom:14px
+    }
+
+    .tabs button, button, .filelabel {
+        border: 0;
+        border-radius: 12px;
+        padding: 11px 14px;
+        font: inherit;
+        cursor:pointer
+    }
+
+    .tabs button {
+        background: #e8ece9;
+        color:var(--ink)
+    }
+
+    .tabs button.active, button.primary {
+        background: var(--green);
+        color:white
+    }
+
+    .secondary {
+        background: #e8ece9;
+        color:var(--ink)
+    }
+
+    label {
+        display: block;
+        font-weight: 650;
+        margin:12px 0 5px
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 11px;
+        border: 1px solid #bdcbc2;
+        border-radius: 10px;
+        font: inherit;
+        background:white
+    }
+
+    small, .muted {
+        color:var(--muted)
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap:12px
+    }
+
+    .grid .full {
+        grid-column:1/-1
+    }
+
+    .score {
+        border-radius: 14px;
+        padding: 14px;
+        margin-top:12px
+    }
+
+    .green {
+        background:var(--mint)
+    }
+
+    .blue {
+        background:var(--blue)
+    }
+
+    .yellow {
+        background:var(--yellow)
+    }
+
+    .red {
+        background:var(--red)
+    }
+
+    .big {
+        font-size: 28px;
+        font-weight:800
+    }
+
+    .pill {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 9px;
+        background: #edf0ed;
+        font-size:13px
+    }
+
+    .resultitem {
+        border-top: 1px solid var(--line);
+        padding:12px 0
+    }
+
+    .notice {
+        border-left: 4px solid #d19c1c;
+        background: #fff8df;
+        padding: 10px 12px;
+        border-radius:8px
+    }
+
+    .altcard {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        margin: 10px 0;
+        background:#fff
+    }
+
+    .altmeta {
+        font-size: 13px;
+        color:var(--muted)
+    }
+
+    .altblocked {
+        border-left:4px solid #b42318
+    }
+
+    .altok {
+        border-left:4px solid #d19c1c
+    }
+
+    .altgood {
+        border-left:4px solid #176b52
+    }
+
+    .altstats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin:10px 0
+    }
+
+    .altstat {
+        background: #f5f7f5;
+        border-radius: 9px;
+        padding:9px
+    }
+
+    .altstat strong {
+        display: block;
+        font-size:17px
+    }
+
+    .altwhy {
+        font-size: 14px;
+        margin:8px 0
+    }
+
+    .altsection {
+        font-weight: 700;
+        margin:12px 0 4px
+    }
+
+    .altbadge {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 12px;
+        background: #edf0ed;
+        margin:2px 4px 2px 0
+    }
+
+    .allergy {
+        border-left: 4px solid #b42318;
+        background: #fff0ef;
+        padding: 10px 12px;
+        border-radius:8px
+    }
+
+    .hidden {
+        display:none
+    }
+
+    .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top:14px
+    }
+
+    h2 {
+        font-size: 20px;
+        margin:0 0 8px
+    }
+
+    h3 {
+        margin: 0 0 6px;
+        font-size:17px
+    }
+
+    .footer {
+        font-size: 12px;
+        color: var(--muted);
+        padding:8px 4px 30px
+    }
+
+    ul {
+        padding-left:20px
+    }
+
+    @media (max-width: 520px) {
+        .grid {
+            grid-template-columns:1fr
+        }
+
+        .wrap {
+            padding:12px
+        }
+
+        header {
+            padding: 18px 15px
+        }
+    }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🥬 FoodCheck</h1>
+        <p>Lebensmittel verstehen. Besser vergleichen.</p>
+    </header>
+    <main class="wrap">
+        <div class="notice">
+            <strong>Prototyp:</strong>
+             Produktdaten können über Open Food Facts per Barcode abgerufen werden. Bitte immer mit der aktuellen Verpackung abgleichen. Keine medizinische Allergiegarantie.
+        </div>
+        <div class="tabs" role="tablist">
+            <button class="active" data-tab="check">Produkt prüfen</button>
+            <button data-tab="compare">Vergleichen</button>
+            <button data-tab="profile">Allergieprofil</button>
+        </div>
+        <section id="check" class="tab panel">
+            <h2>Produktdaten eingeben</h2>
+            <p class="muted">Nährwerte je 100 g (bei Getränken je 100 ml) laut aktueller Verpackung. Unbekannte Werte leer lassen.</p>
+            <div class="grid">
+                <div class="full">
+                    <label for="barcode">Barcode (EAN/GTIN)</label>
+                    <div class="grid" style="grid-template-columns:minmax(0,1fr) auto">
+                        <input id="barcode" inputmode="numeric" autocomplete="off" placeholder="Barcode eingeben oder scannen">
+                        <button type="button" class="secondary" id="lookupBarcode">Produkt suchen</button>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="primary" id="startScan">📷 Kamera-Scan starten</button>
+                        <button type="button" class="secondary hidden" id="stopScan">Scan beenden</button>
+                    </div>
+                    <video id="scannerVideo" class="hidden" playsinline style="width:100%;max-height:300px;border-radius:12px;background:#111;margin-top:8px"></video>
+                    <p id="scanStatus" class="muted">Datenquelle: Open Food Facts. Wenn die Kamera nicht unterstützt wird, Barcode manuell eingeben.</p>
+                </div>
+                <div class="full">
+                    <label for="name">Produktname</label>
+                    <input id="name" placeholder="z. B. Gemüse-Pizza">
+                </div>
+                <div>
+                    <label for="pack">Packungsmenge</label>
+                    <div class="grid" style="grid-template-columns:minmax(0,1fr) 90px;gap:8px">
+                        <input id="pack" type="number" min="1" placeholder="z. B. 350">
+                        <select id="packUnit" aria-label="Einheit der Packungsmenge"><option value="g">g</option><option value="ml">ml</option></select>
+                    </div>
+                </div>
+                <div>
+                    <label for="kcal">Energie (kcal/100 g bzw. 100 ml)</label>
+                    <input id="kcal" type="number" min="0" step=".1">
+                </div>
+                <div>
+                    <label for="salt">Salz (g/100 g bzw. 100 ml)</label>
+                    <input id="salt" type="number" min="0" step=".01">
+                </div>
+                <div>
+                    <label for="satfat">Gesättigte Fettsäuren (g/100 g bzw. 100 ml)</label>
+                    <input id="satfat" type="number" min="0" step=".1">
+                </div>
+                <div>
+                    <label for="sugar">Zucker (g/100 g bzw. 100 ml)</label>
+                    <input id="sugar" type="number" min="0" step=".1">
+                </div>
+                <div>
+                    <label for="fiber">Ballaststoffe (g/100 g bzw. 100 ml)</label>
+                    <input id="fiber" type="number" min="0" step=".1">
+                </div>
+                <div>
+                    <label for="protein">Eiweiß (g/100 g bzw. 100 ml)</label>
+                    <input id="protein" type="number" min="0" step=".1">
+                </div>
+                <div>
+                    <label for="veg">Verifizierter Gemüseanteil (%)</label>
+                    <input id="veg" type="number" min="0" max="100" step=".1">
+                </div>
+                <div class="full">
+                    <label for="allergens">Zutaten / Allergene / Spurenhinweise (Text von Packung)</label>
+                    <textarea id="allergens" rows="3" placeholder="Zutaten und hervorgehobene Allergene eintragen"></textarea>
+                </div>
+                <div class="full">
+                    <label for="dataQuality">Datenqualität</label>
+                    <select id="dataQuality">
+                        <option value="verified">Anhand aktueller Packung geprüft</option>
+                        <option value="partial" selected>Teilweise geprüft</option>
+                        <option value="unknown">Unklar / Quelle unbekannt</option>
+                    </select>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="primary" id="evaluate">Produkt bewerten</button>
+                <button class="secondary" id="save">In Vergleichsliste speichern</button>
+                <button class="secondary" id="clear">Leeren</button>
+            </div>
+            <div id="result"></div>
+        </section>
+        <section id="compare" class="tab panel hidden">
+            <h2>Produktvergleich</h2>
+            <p class="muted">Gespeicherte Produkte werden auf Basis der verfügbaren Angaben verglichen.</p>
+            <div id="compareList"></div>
+            <div class="actions">
+                <button class="secondary" id="export">Vergleich als CSV exportieren</button>
+                <button class="secondary" id="deleteAll">Liste leeren</button>
+            </div>
+        </section>
+        <section id="profile" class="tab panel hidden">
+            <h2>Allergieprofil</h2>
+            <p>Wähle Allergene aus, die FoodCheck beim manuellen Prüfen markieren soll.</p>
+            <div class="grid" id="allergenOptions"></div>
+            <div class="actions">
+                <button class="primary" id="saveProfile">Profil speichern</button>
+            </div>
+            <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
+        </section>
+        <div class="footer">FoodCheck Version 1.0.9 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+    </main>
+    <script>
+    const $ = id => document.getElementById(id);
+    const fields = ['name', 'pack', 'kcal', 'salt', 'satfat', 'sugar', 'fiber', 'protein', 'veg', 'allergens', 'dataQuality'];
+    let products = [];
+    let profile = [];
+    const allergenNames = ['Gluten/Weizen', 'Milch', 'Ei', 'Soja', 'Erdnüsse', 'Schalenfrüchte', 'Sellerie', 'Senf', 'Sesam', 'Fisch', 'Krebstiere', 'Weichtiere', 'Lupine', 'Schwefeldioxid/Sulfite'];
+    try {
+        products = JSON.parse(localStorage.getItem('fc_products') || '[]')
+    } catch (e) {}
+    try {
+        profile = JSON.parse(localStorage.getItem('fc_profile') || '[]')
+    } catch (e) {}
+    document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+        document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('active', x === b));
+        document.querySelectorAll('.tab').forEach(s => s.classList.toggle('hidden', s.id !== b.dataset.tab));
+        if (b.dataset.tab === 'compare')
+            renderCompare()
+    }));
+    function val(id) {
+        const x = $(id).value.trim();
+        return x === '' ? null : Number(x)
+    }
+    $('veg').addEventListener('input', () => {
+        $('veg').dataset.source = 'manual';
+        $('veg').dataset.note = 'Manuell eingegebener Wert';
+    });
+    function getProduct() {
+        return {
+            barcode: $('barcode').value.trim(),
+            name: $('name').value.trim() || 'Unbenanntes Produkt',
+            pack: val('pack'),
+            packUnit: $('packUnit').value || 'g',
+            kcal: val('kcal'),
+            salt: val('salt'),
+            satfat: val('satfat'),
+            sugar: val('sugar'),
+            fiber: val('fiber'),
+            protein: val('protein'),
+            veg: val('veg'),
+            vegSource: $('veg').dataset.source || 'manual',
+            allergens: $('allergens').value.trim(),
+            dataQuality: $('dataQuality').value
+        }
+    }
+    function linear(x, anchors) {
+        if (x === null || !Number.isFinite(x))
+            return null;
+        if (x <= anchors[0][0])
+            return anchors[0][1];
+        for (let i = 1; i < anchors.length; i++) {
+            let [x1, y1] = anchors[i - 1],
+                [x2, y2] = anchors[i];
+            if (x <= x2)
+                return y1 + (y2 - y1) * (x - x1) / (x2 - x1)
+        }
+        return anchors.at(-1)[1]
+    }
+    function points(p) {
+        return {
+            salt: linear(p.salt, [[.5, 100], [.75, 80], [1, 60], [1.25, 40], [1.5, 20], [2, 0]]),
+            satfat: linear(p.satfat, [[1.5, 100], [2.5, 75], [3.5, 50], [5, 25], [7, 0]]),
+            sugar: linear(p.sugar, [[2, 100], [3, 75], [5, 50], [8, 25], [12, 0]]),
+            kcal: linear(p.kcal, [[170, 100], [200, 75], [230, 50], [270, 25], [320, 0]]),
+            fiber: linear(p.fiber, [[.5, 0], [1.5, 25], [3, 50], [4, 75], [6, 100]]),
+            protein: linear(p.protein, [[3, 0], [6, 25], [9, 50], [12, 75], [15, 100]]),
+            veg: p.veg === null ? null : (p.veg >= 30 ? 100 : p.veg >= 20 ? 80 : p.veg >= 10 ? 60 : p.veg > 0 ? 30 : 0)
+        }
+    }
+    function score(p) {
+        let pts = points({...p, veg: p.vegSource === 'ingredient-minimum' ? null : p.veg}),
+            weights = {
+                salt: .2,
+                satfat: .15,
+                sugar: .1,
+                kcal: .1,
+                fiber: .15,
+                protein: .1,
+                veg: .2
+            };
+        let keys = Object.keys(weights);
+        if (keys.some(k => pts[k] === null))
+            return {
+                pts,
+                total: null,
+                color: 'Nicht bewertbar'
+            };
+        let total = keys.reduce((s, k) => s + pts[k] * weights[k], 0);
+        let color = total >= 85 ? 'Grün' : total >= 70 ? 'Blau' : total >= 40 ? 'Gelb' : 'Rot';
+        if (p.salt >= 2)
+            color = 'Rot';
+        else if (p.salt > 1.5 && ['Grün', 'Blau'].includes(color))
+            color = 'Gelb';
+        return {
+            pts,
+            total,
+            color
+        }
+    }
+    function meal(p) {
+        if (p.pack === null)
+            return null;
+        const vals = {
+            kcal: p.kcal === null ? null : p.kcal * p.pack / 100,
+            salt: p.salt === null ? null : p.salt * p.pack / 100,
+            satfat: p.satfat === null ? null : p.satfat * p.pack / 100,
+            fiber: p.fiber === null ? null : p.fiber * p.pack / 100,
+            protein: p.protein === null ? null : p.protein * p.pack / 100
+        };
+        const missing = Object.entries(vals).filter(([k, v]) => v === null).map(([k]) => k);
+        if (missing.length)
+            return {
+                vals,
+                total: null,
+                missing
+            };
+        let e = vals.kcal <= 400 ? 100 : vals.kcal <= 550 ? 80 : vals.kcal <= 700 ? 50 : vals.kcal <= 850 ? 20 : 0;
+        let s = vals.salt <= .5 ? 100 : vals.salt <= 1 ? 80 : vals.salt <= 2 ? 50 : vals.salt <= 3 ? 20 : 0;
+        let f = vals.satfat <= 2 ? 100 : vals.satfat <= 4 ? 80 : vals.satfat <= 7 ? 50 : vals.satfat <= 10 ? 20 : 0;
+        let pr = vals.protein < 10 ? 20 : vals.protein < 20 ? 50 : vals.protein < 30 ? 80 : 100;
+        let fi = vals.fiber < 3 ? 20 : vals.fiber < 5 ? 50 : vals.fiber < 8 ? 80 : 100; /* Vegetable share is deliberately not scored when unknown; weights are normalized over the available meal indicators. */
+        let total = (e * .15 + s * .15 + f * .1 + pr * .2 + fi * .2) / .8;
+        let color = total >= 85 ? 'Grün' : total >= 70 ? 'Blau' : total >= 40 ? 'Gelb' : 'Rot';
+        if (vals.salt >= 4)
+            color = 'Rot';
+        else if (vals.salt > 3 && ['Grün', 'Blau'].includes(color))
+            color = 'Gelb';
+        return {
+            vals,
+            total,
+            color,
+            vegUnknown: p.veg === null,
+            points: {
+                e,
+                s,
+                f,
+                pr,
+                fi
+            }
+        }
+    }
+    function allergyTerms() {
+        return {
+            'gluten/weizen': ['en:wheat', 'en:gluten', 'weizen', 'roggen', 'gerste', 'gluten'],
+            'milch': ['en:milk', 'milch', 'laktose', 'molke', 'käse', 'mozzarella'],
+            'ei': ['en:eggs', 'en:egg', 'eier', 'ei'],
+            'soja': ['en:soybeans', 'sojabohne', 'soja'],
+            'erdnüsse': ['en:peanuts', 'erdnuss'],
+            'schalenfrüchte': ['en:nuts', 'mandel', 'haselnuss', 'walnuss', 'cashew', 'pistazie', 'pecannuss', 'macadamia'],
+            'sellerie': ['en:celery', 'sellerie'],
+            'senf': ['en:mustard', 'senf'],
+            'sesam': ['en:sesame-seeds', 'sesam'],
+            'fisch': ['en:fish', 'fisch'],
+            'krebstiere': ['en:crustaceans', 'krebstier'],
+            'weichtiere': ['en:molluscs', 'weichtier'],
+            'lupine': ['en:lupin', 'lupine'],
+            'schwefeldioxid/sulfite': ['en:sulphur-dioxide-and-sulphites', 'sulfit', 'schwefeldioxid']
+        };
+    }
+    function containsAllergen(text, term) {
+        const t = String(text || '').toLowerCase().replaceAll('_', '-');
+        const x = term.toLowerCase();
+        if (x.startsWith('en:'))
+            return t.includes(x);
+        if (x === 'ei')
+            return /(^|[^a-zäöüß])(ei|eier|eipulver|eiweiß|eiklar)([^a-zäöüß]|$)/i.test(t);
+        // Match whole words and ingredient compounds (e.g. Weizenmehl), but not arbitrary substrings (e.g. Ei in Weizen).
+        const escaped = x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp('(^|[^a-zäöüß])' + escaped + '[a-zäöüß-]*', 'i').test(t);
+    }
+    function allergyEvidence(p) {
+        let raw = String(p.allergens || '');
+        let declared = String(p._allergenTags || '');
+        let traces = String(p._tracesTags || '');
+        let ingredients = String(p._ingredients || '');
+        if (!declared) {
+            const parts = raw.split('|');
+            declared = parts[0] || raw;
+            for (const part of parts) {
+                if (/^\s*Spuren\s*:/i.test(part))
+                    traces += ' ' + part.replace(/^\s*Spuren\s*:/i, '');
+                if (/^\s*Zutaten\s*:/i.test(part))
+                    ingredients += ' ' + part.replace(/^\s*Zutaten\s*:/i, '');
+            }
+        }
+        const mayContain = [];
+        const m = ingredients.match(/(?:Kann enthalten|Kann Spuren von enthalten|Spuren von)\s*:\s*([^.;]+)/i);
+        if (m)
+            mayContain.push(m[1]);
+        const beforeMay = ingredients.split(/Kann enthalten|Kann Spuren von enthalten|Spuren von/i)[0];
+        const declaredText = [declared, beforeMay].join(' ');
+        const traceText = [traces, ...mayContain].join(' ');
+        return {
+            declared: declaredText,
+            traces: traceText,
+            hasTraceInfo: !!traceText.trim(),
+            ingredients
+        };
+    }
+    function allergyMatches(p) {
+        const ev = allergyEvidence(p),
+            map = allergyTerms();
+        const hits = [];
+        for (const a of profile) {
+            const key = a.toLowerCase();
+            const terms = map[key] || [key];
+            const inDeclared = terms.some(t => containsAllergen(ev.declared, t));
+            const inTraces = terms.some(t => containsAllergen(ev.traces, t));
+            if (inDeclared || inTraces)
+                hits.push({
+                    name: a,
+                    where: inDeclared && inTraces ? 'enthalten und als Spur genannt' : inDeclared ? 'enthalten' : 'Kann enthalten'
+                });
+        }
+        return {
+            evidence: ev,
+            hits
+        };
+    }
+    function allergyStatus(p) {
+        if (!profile.length)
+            return {
+                kind: 'notice',
+                text: 'Kein Allergieprofil ausgewählt. Enthaltene Allergene und mögliche Spuren bitte auf der Verpackung prüfen.'
+            };
+
+        const {evidence, hits} = allergyMatches(p);
+
+        // Ein erkannter Treffer hat immer Vorrang – auch wenn die Zutatenliste fehlt.
+        if (hits.length)
+            return {
+                kind: 'allergy',
+                text: 'Nicht geeignet bei deinem Allergieprofil: ' + hits.map(h => h.name + ' (' + h.where + ')').join(', ') + '. Nicht verzehren; aktuelle Verpackung beachten.'
+            };
+
+        // Den Zutatenabschnitt aus dem Barcode-Eingabefeld direkt auslesen.
+        // Ein vorhandener, aber leerer "| Zutaten:"-Abschnitt gilt ausdrücklich als fehlende Zutatenliste.
+        const rawAllergenField = String(p.allergens || '').trim();
+        const ingredientSection = rawAllergenField.match(/\|\s*Zutaten\s*:\s*([\s\S]*)$/i);
+        const hasIngredientMarker = !!ingredientSection;
+        const ingredients = hasIngredientMarker
+            ? String(ingredientSection[1] || '').trim()
+            : String(evidence.ingredients || p._ingredients || rawAllergenField).trim();
+
+        if (!ingredients)
+            return {
+                kind: 'allergy',
+                text: 'Allergieprüfung unvollständig: Die Zutatenliste fehlt oder ist leer. Keine Freigabe möglich; aktuelle Verpackung prüfen.'
+            };
+
+        return {
+            kind: 'notice',
+            text: 'Kein Treffer in den erfassten Angaben erkannt. Das ist keine Sicherheitsfreigabe: Daten können unvollständig sein; Zutaten und Spurenhinweise auf der Verpackung prüfen.'
+        };
+    }
+
+    function mealBreakdownHtml(m) {
+        if (!m || m.total === null)
+            return '';
+        const rows = [
+        ['Energie', 'kcal', 'kcal', m.points.e, .15],
+        ['Salz', 'salt', 'g', m.points.s, .15],
+        ['Gesättigte Fettsäuren', 'satfat', 'g', m.points.f, .10],
+        ['Eiweiß', 'protein', 'g', m.points.pr, .20],
+        ['Ballaststoffe', 'fiber', 'g', m.points.fi, .20]
+        ];
+        const fmt = (v) => Number(v).toLocaleString('de-DE', {
+            maximumFractionDigits: 2
+        });
+        return `<h3 style="margin-top:14px">So entstehen die Punkte</h3><p class="muted">Alle Mengen beziehen sich auf die ganze Packung. Der Einzelwert wird mit seiner Gewichtung verrechnet; die verbleibenden Gewichte werden auf 100 % normiert, ${m.vegUnknown ? 'weil der Gemüseanteil unbekannt ist.' : 'Der Gemüseanteil ist bekannt und fließt nicht in diese separate Packungsbewertung ein.'}</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:7px;border-bottom:1px solid var(--line)">Kriterium</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Menge</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Einzelwert</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Gewichtung</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Punktebeitrag</th></tr></thead><tbody>${rows.map(([label, key, unit, pts, w]) => `<tr><td style="padding:7px;border-bottom:1px solid var(--line)">${label}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(m.vals[key])} ${unit}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts)}/100</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${Math.round(w * 100)} %</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts * w)} P.</td></tr>`).join('')}</tbody></table></div><p><strong>Berechnung:</strong> ungekürzte gewichtete Beiträge addieren (${fmt(rows.reduce((sum, row) => sum + row[3] * row[4], 0))} Punkte); anschließend durch die Summe der berücksichtigten Gewichte (80 %) teilen. Ergebnis: ${fmt(m.total)} → gerundet ${Math.round(m.total)}/100.</p><p class="muted">Hinweis: Das ist die derzeitige vorläufige FoodCheck-Testformel Version 0.6, keine medizinisch oder wissenschaftlich validierte Ernährungsbewertung.</p>`;
+    }
+    function resultHtml(p) {
+        let s = score(p),
+            m = meal(p),
+            a = allergyStatus(p);
+        let quality = p.dataQuality === 'verified' ? 'Anhand aktueller Packung geprüft' : p.dataQuality === 'partial' ? 'Teilweise geprüft' : 'Quelle/Daten unklar';
+        return `<div class="score ${s.color.toLowerCase() === 'grün' ? 'green' : s.color.toLowerCase() === 'blau' ? 'blue' : s.color.toLowerCase() === 'gelb' ? 'yellow' : 'red'}"><h3>Ernährungsqualität</h3><div class="big">${s.total === null ? 'Nicht bewertbar' : Math.round(s.total) + '/100 · ' + s.color}</div><small>Prototyp-Score · ${quality}</small>${p.veg !== null && p.vegSource === 'ingredient-minimum' ? '<p><strong>Gemüse-Mindestanteil aus Zutatenliste: ' + fmt(p.veg) + ' %.</strong> Nur ausdrücklich bezifferte Gemüsezutaten wurden addiert; nicht bezifferte Gemüsebestandteile sind nicht enthalten. Dieser Mindestwert ist kein bestätigter Gemüseanteil und reicht deshalb nicht für die Bewertung der Ernährungsqualität. Grundlage: ' + escapeHtml($('veg').dataset.note || '') + '.</p>' : ''}${s.total === null ? '<p>Pflichtangaben fehlen: ' + Object.entries(s.pts).filter(([k, v]) => v === null).map(([k]) => ({salt:'Salz',satfat:'gesättigte Fettsäuren',sugar:'Zucker',kcal:'Energie',fiber:'Ballaststoffe',protein:'Eiweiß',veg:'bestätigter Gemüseanteil'}[k] || k)).join(', ') + '.</p>' : ''}</div><div class="score ${m && m.total !== null ? m.color.toLowerCase() === 'grün' ? 'green' : m.color.toLowerCase() === 'blau' ? 'blue' : m.color.toLowerCase() === 'gelb' ? 'yellow' : 'red' : 'yellow'}"><h3>Mahlzeitentauglichkeit</h3><div class="big">${!m || m.total === null ? 'Nicht bewertbar' : Math.round(m.total) + '/100 · ' + m.color}</div><small>Bewertung der ganzen Packung · Testmodell, nicht wissenschaftlich validiert</small>${!m ? '<p>Packungsgewicht fehlt. Bitte das Gewicht der ganzen Packung in Gramm eintragen.</p>' : m.total === null ? '<p>Für diese Bewertung fehlen noch: ' + (m.missing || []).join(', ') + '.</p>' : (m.vegUnknown ? '<p>Gemüseanteil unbekannt und deshalb nicht in diese Teilbewertung eingerechnet. Die Ernährungsqualität bleibt davon unabhängig nicht bewertbar.</p>' : '') + mealBreakdownHtml(m)}</div><div class="${a.kind}"><strong>Allergieprüfung</strong><br>${a.text}</div><div class="panel" style="margin-top:14px"><h3>Ähnliche Alternativen</h3><p class="muted">Suche bis zu drei ähnliche Produkte in Open Food Facts. Die Treffer sind zunächst Prüfkandidaten; Produktdaten und Allergene müssen mit der aktuellen Verpackung abgeglichen werden.</p><div class="actions"><button type="button" class="secondary" id="findAlternatives">3 ähnliche Alternativen suchen</button></div><div id="alternativesResult"></div></div><p class="muted">Farben und Punkteskalen sind vorläufige Testregeln. Die aktuelle Verpackung ist maßgeblich.</p>`
+    }
+    // Similar-product discovery (Open Food Facts). Results are candidates, not safety-certified recommendations.
+    function offPackInfo(p) {
+        const q = normalizeNumber(p.product_quantity);
+        const unit = String(p.product_quantity_unit || '').toLowerCase();
+        if (q === null || q <= 0)
+            return { amount: null, unit: 'g' };
+        if (unit === 'ml') return { amount: q, unit: 'ml' };
+        if (unit === 'l') return { amount: q * 1000, unit: 'ml' };
+        if (unit === 'g') return { amount: q, unit: 'g' };
+        if (unit === 'kg') return { amount: q * 1000, unit: 'g' };
+        const text = String(p.quantity || '').toLowerCase();
+        const match = text.match(/([0-9]+(?:[.,][0-9]+)?)\s*(ml|cl|l|kg|g)\b/i);
+        if (!match) return { amount: null, unit: 'g' };
+        const amount = Number(match[1].replace(',', '.'));
+        const u = match[2].toLowerCase();
+        if (u === 'ml') return { amount, unit: 'ml' };
+        if (u === 'cl') return { amount: amount * 10, unit: 'ml' };
+        if (u === 'l') return { amount: amount * 1000, unit: 'ml' };
+        if (u === 'kg') return { amount: amount * 1000, unit: 'g' };
+        return { amount, unit: 'g' };
+    }
+    function offPack(p) { return offPackInfo(p).amount; }
+    function offNutriments(p) {
+        const n = p.nutriments || {};
+        const unit = offPackInfo(p).unit;
+        const suffix = unit === 'ml' ? '_100ml' : '_100g';
+        const get = (base) => normalizeNumber(n[base + suffix]);
+        return { unit, kcal: get('energy-kcal'), salt: get('salt'), satfat: get('saturated-fat'), sugar: get('sugars'), fiber: get('fiber'), protein: get('proteins') };
+    }
+    // Extract only explicitly quantified vegetable ingredients. The result is a documented minimum, not an estimate of all vegetables.
+    function extractVegetableMinimum(text) {
+        const source = String(text || '').replace(/\s+/g, ' ').trim();
+        if (!source)
+            return null;
+        const vegTerms = /(tomat|paprika|zwiebel|lauch|porree|spinat|aubergin|zucchin|brokkoli|blumenkohl|karott|möhre|möhr|kürbis|gurk|sellerie|mais|erbs|bohn|pilz|champignon|artischock|fenchel|rote bete|rande|radieschen|rettich|spargel|grünkohl|wirsing|kohl|mangold|chicorée|knoblauch|peperoni|chili)/i;
+        const segments = source.split(/[,;]+/);
+        let total = 0,
+            found = [];
+        for (const raw of segments) {
+            const segment = raw.trim().replace(/^[\s([{]+|[\s)\]}.,]+$/g, '').trim();
+            if (!segment)
+                continue;
+            let label = '',
+                amount = null,
+                match;
+            // Ingredient followed by a percentage, including common parenthesized forms: tomatoes (15%).
+            match = segment.match(/^(.{1,120}?)\s*\(?\s*(\d{1,3}(?:[.,]\d+)?)\s*%\s*\)?$/);
+            if (match) {
+                label = match[1].trim();
+                amount = Number(match[2].replace(',', '.'));
+            }
+            else {
+                // Percentage before ingredient: 15% tomato puree.
+                match = segment.match(/^(\d{1,3}(?:[.,]\d+)?)\s*%\s*(.{1,120})$/);
+                if (match) {
+                    amount = Number(match[1].replace(',', '.'));
+                    label = match[2].trim();
+                }
+            }
+            label = label.replace(/[()\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (!label || !vegTerms.test(label) || !Number.isFinite(amount) || amount <= 0 || amount > 100)
+                continue;
+            total += amount;
+            found.push({
+                label,
+                amount
+            });
+        }
+        if (!found.length)
+            return null;
+        return {
+            value: Math.min(total, 100),
+            items: found
+        };
+    }
+    function applyVegFromIngredients(ingredients) {
+        const parsed = extractVegetableMinimum(ingredients);
+        $('veg').dataset.source = parsed ? 'ingredient-minimum' : 'unknown';
+        $('veg').dataset.note = parsed ? parsed.items.map(x => x.label.trim() + ': ' + String(x.amount).replace('.', ',') + ' %').join('; ') : '';
+        $('veg').value = parsed ? parsed.value.toFixed(1) : '';
+        return parsed;
+    }
+    function offToProduct(p) {
+        const n = offNutriments(p);
+        return {
+            barcode: p.code || '',
+            name: firstValue(p, ['product_name_de', 'product_name']) || 'Produkt ohne Namen',
+            brand: firstValue(p, ['brands']) || '',
+            pack: offPack(p),
+            packUnit: n.unit,
+            kcal: n.kcal,
+            salt: n.salt,
+            satfat: n.satfat,
+            sugar: n.sugar,
+            fiber: n.fiber,
+            protein: n.protein,
+            veg: (extractVegetableMinimum(firstValue(p, ['ingredients_text_de', 'ingredients_text']) || '') || {}).value ?? null,
+            allergens: [p.allergens || '', (p.allergens_tags || []).join(' '), (p.traces || ''), (p.traces_tags || []).join(' ')].join(' ').trim(),
+            dataQuality: 'partial',
+            _ingredients: firstValue(p, ['ingredients_text_de', 'ingredients_text']) || '',
+            _allergenTags: (p.allergens_tags || []).join(' '),
+            _tracesTags: (p.traces_tags || []).join(' ')
+        };
+    }
+    function candidateAllergy(p) {
+        if (!profile.length)
+            return {
+                blocked: false,
+                label: 'Kein Allergieprofil hinterlegt – Verpackung vollständig prüfen.',
+                kind: 'altok'
+            };
+        const {evidence, hits} = allergyMatches(p);
+        if (hits.length)
+            return {
+                blocked: true,
+                label: 'Nicht geeignet bei deinem Allergieprofil: ' + hits.map(h => h.name + ' (' + h.where + ')').join(', ') + '. Nicht als Alternative empfehlen.',
+                kind: 'altblocked'
+            };
+        return {
+            blocked: true,
+            label: 'Keine eindeutige Übereinstimmung erkannt. Daten können unvollständig sein; keine Freigabe ohne Prüfung der aktuellen Zutaten- und Spurenhinweise.',
+            kind: 'altblocked'
+        };
+    }
+    function mealColorClass(color) {
+        return color === 'Grün' ? 'green' : color === 'Blau' ? 'blue' : color === 'Gelb' ? 'yellow' : 'red'
+    }
+    function fmtAlt(v, unit, digits=1) {
+        return v === null || v === undefined ? 'nicht angegeben' : Number(v).toLocaleString('de-DE', {
+            maximumFractionDigits: digits
+        }) + ' ' + unit
+    }
+    function compareAlt(candidate, base) {
+        const names = {
+            kcal: 'Energie',
+            salt: 'Salz',
+            satfat: 'gesättigte Fettsäuren',
+            protein: 'Eiweiß',
+            fiber: 'Ballaststoffe'
+        };
+        const lowerBetter = ['kcal', 'salt', 'satfat'];
+        const lines = [];
+        for (const key of ['kcal', 'salt', 'satfat', 'protein', 'fiber']) {
+            const a = candidate.mealResult.vals[key],
+                b = base[key] === null ? null : base[key] * base.pack / 100;
+            if (a === null || b === null || !Number.isFinite(b))
+                continue;
+            const better = lowerBetter.includes(key) ? a < b : a > b;
+            const equal = Math.abs(a - b) < 0.001;
+            lines.push(`${names[key]} ${equal ? 'ähnlich' : better ? 'günstiger' : 'ungünstiger'}`);
+        }
+        return lines.length ? lines.join(' · ') : 'Kein belastbarer Nährwertvergleich möglich.';
+    }
+    async function findAlternatives() {
+        const button = $('findAlternatives'),
+            box = $('alternativesResult');
+        if (!button || !box)
+            return;
+        const current = getProduct();
+        const query = 'pizza mozzarella';
+        button.disabled = true;
+        button.textContent = 'Suche läuft …';
+        box.innerHTML = '<p class="muted">Open Food Facts wird nach ähnlichen Produkten durchsucht …</p>';
+        try {
+            const fields = 'code,product_name,product_name_de,brands,quantity,product_quantity,product_quantity_unit,nutriments,ingredients_text,ingredients_text_de,allergens,allergens_tags,traces,traces_tags';
+            // Bevorzugt die aktuelle Open-Food-Facts-API v2; ältere CGI-Suche nur als Rückfall.
+            const params = new URLSearchParams({
+                search_terms: query,
+                page_size: '60',
+                fields
+            });
+            const urls = [
+            'https://world.openfoodfacts.org/api/v2/search?' + params.toString(),
+            'https://world.openfoodfacts.org/cgi/search.pl?search_terms=' + encodeURIComponent(query) + '&search_simple=1&action=process&json=1&page_size=60&fields=' + encodeURIComponent(fields)
+            ];
+            let data = null,
+                lastError = null;
+            for (const url of urls) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    if (!res.ok)
+                        throw new Error('HTTP ' + res.status);
+                    data = await res.json();
+                    if (data && Array.isArray(data.products))
+                        break;
+                    throw new Error('Unerwartetes Datenbankformat');
+                } catch (err) {
+                    lastError = err;
+                }
+            }
+            if (!data || !Array.isArray(data.products))
+                throw new Error('Open Food Facts ist nicht erreichbar (' + (lastError && lastError.message ? lastError.message : 'Netzwerk-/CORS-Fehler') + '). Bitte Internetverbindung prüfen.');
+            const seen = new Set([current.barcode]);
+            const candidates = (data.products || []).map(offToProduct).filter(p => p.barcode && !seen.has(p.barcode) && p.pack && p.kcal !== null && p.salt !== null && p.satfat !== null && p.fiber !== null && p.protein !== null && /pizza/i.test(p.name));
+            const scored = candidates.map(p => ({
+                ...p,
+                mealResult: meal(p),
+                allergy: candidateAllergy(p)
+            })).filter(p => p.mealResult && p.mealResult.total !== null);
+            const unique = [];
+            for (const p of scored) {
+                if (!unique.some(x => x.barcode === p.barcode))
+                    unique.push(p)
+            }
+            unique.sort((a, b) => b.mealResult.total - a.mealResult.total);
+            const top = unique.slice(0, 3);
+            if (!top.length) {
+                box.innerHTML = '<p>Es wurden keine ausreichend vollständigen ähnlichen Datensätze gefunden. Bitte später erneut versuchen. Es werden keine fehlenden Werte geschätzt.</p>';
+                return
+            }
+            const baseVals = current.pack ? {
+                ...current,
+                pack: current.pack
+            } : null;
+            box.innerHTML = '<p class="muted">' + top.length + ' Prüfkandidat(en), nach Mahlzeitentauglichkeit sortiert. Die Produktdaten stammen aus Open Food Facts und sind nicht unabhängig verifiziert.</p>' + top.map((p, i) => {
+                const a = p.allergy,
+                    blocked = a.blocked;
+                const color = mealColorClass(p.mealResult.color);
+                const brand = p.brand ? `<p class="altmeta">Hersteller/Marke: ${escapeHtml(p.brand)}</p>` : '';
+                const comparison = baseVals ? compareAlt(p, baseVals) : 'Kein Vergleich mit dem Ausgangsprodukt möglich.';
+                const allergens = p._allergenTags ? escapeHtml(p._allergenTags.replaceAll('en:', '').replaceAll('-', ', ')) : 'Keine strukturierten Allergenangaben hinterlegt';
+                const traces = p._tracesTags ? escapeHtml(p._tracesTags.replaceAll('en:', '').replaceAll('-', ', ')) : 'Keine strukturierten Spurenhinweise hinterlegt';
+                const reason = `${Math.round(p.mealResult.total - currentMealScore(current)) >= 0 ? 'Punktzahl mindestens so hoch wie beim Ausgangsprodukt' : 'Punktzahl niedriger als beim Ausgangsprodukt'}. ${comparison}`;
+                return `<article class="altcard ${blocked ? 'altblocked' : 'altok'}"><h3>${i + 1}. ${escapeHtml(p.name)}</h3>${brand}<div class="score ${color}" style="margin:8px 0"><div class="big">${Math.round(p.mealResult.total)}/100 · ${escapeHtml(p.mealResult.color)}</div><strong>Mahlzeitentauglichkeit</strong></div><div class="altsection">Nährwerte pro ganzer Packung (${p.pack} g)</div><div class="altstats"><div class="altstat"><span class="altmeta">Energie</span><strong>${fmtAlt(p.mealResult.vals.kcal, 'kcal')}</strong></div><div class="altstat"><span class="altmeta">Salz</span><strong>${fmtAlt(p.mealResult.vals.salt, 'g', 2)}</strong></div><div class="altstat"><span class="altmeta">Gesättigte Fettsäuren</span><strong>${fmtAlt(p.mealResult.vals.satfat, 'g', 2)}</strong></div><div class="altstat"><span class="altmeta">Eiweiß</span><strong>${fmtAlt(p.mealResult.vals.protein, 'g', 2)}</strong></div><div class="altstat"><span class="altmeta">Ballaststoffe</span><strong>${fmtAlt(p.mealResult.vals.fiber, 'g', 2)}</strong></div></div><p class="altwhy"><strong>Vergleich zum gescannten Produkt:</strong> ${escapeHtml(comparison)}</p><div class="altsection">Allergen-Prüfstatus</div><p><strong>${blocked ? 'Keine Freigabe – manuelle Prüfung erforderlich' : 'Kein Allergieprofil hinterlegt'}</strong><br>${escapeHtml(a.label)}</p><p class="altmeta"><strong>In der Datenbank ausgewiesene Allergene:</strong> ${allergens}<br><strong>Spurenhinweise:</strong> ${traces}</p><p class="altmeta">Barcode: ${escapeHtml(p.barcode)} · Quelle: Open Food Facts · Datenqualität: nicht anhand der aktuellen Verpackung verifiziert</p></article>`
+            }).join('') + '<p class="notice">Wichtig: Diese Treffer sind nur Prüfkandidaten. Bei aktivem Allergieprofil wird keine Alternative als sicher freigegeben. Auch ohne erkannten Treffer müssen Zutaten, hervorgehobene Allergene und Spurenhinweise auf der aktuellen Verpackung geprüft werden.</p>';
+        } catch (e) {
+            box.innerHTML = '<p class="allergy">Alternativensuche fehlgeschlagen: ' + escapeHtml(e.message) + '. Bitte später erneut versuchen.</p>'
+        }
+        finally {
+            button.disabled = false;
+            button.textContent = '3 ähnliche Alternativen suchen'
+        }
+    }
+    function currentMealScore(p) {
+        const m = meal(p);
+        return m && m.total !== null ? m.total : 0
+    }
+    document.addEventListener('click', e => {
+        if (e.target && e.target.id === 'findAlternatives')
+            findAlternatives()
+    });
+
+    $('evaluate').onclick = () => {
+        $('result').innerHTML = resultHtml(getProduct())
+    };
+    $('save').onclick = () => {
+        let p = getProduct();
+        if (!p.name || p.name === 'Unbenanntes Produkt') {
+            alert('Bitte Produktname eingeben.');
+            return
+        }
+        products.push(p);
+        try {
+            localStorage.setItem('fc_products', JSON.stringify(products))
+        } catch (e) {}
+        $('result').innerHTML = resultHtml(p) + '<p class="pill">In Vergleichsliste übernommen</p>';
+    };
+    $('clear').onclick = () => {
+        fields.forEach(id => {
+            if (id === 'dataQuality')
+                $(id).value = 'partial';
+            else
+                $(id).value = ''
+        });
+        $('result').innerHTML = ''
+    };
+    function renderCompare() {
+        if (!products.length) {
+            $('compareList').innerHTML = '<p>Noch keine Produkte gespeichert. Lege im Tab „Produkt prüfen“ ein Produkt an.</p>';
+            return
+        }
+        $('compareList').innerHTML = products.map((p, i) => {
+            let s = score(p),
+                m = meal(p);
+            return `<div class="resultitem"><h3>${escapeHtml(p.name)}</h3><p>Packung: ${p.pack ?? '–'} g · Energie: ${p.kcal === null ? '–' : p.kcal + ' kcal/100 g'} · Salz: ${p.salt === null ? '–' : p.salt + ' g/100 g'}</p><p>Ernährungsqualität: <strong>${s.total === null ? 'nicht bewertbar' : Math.round(s.total) + '/100 · ' + s.color}</strong></p><p>Mahlzeitentauglichkeit: <strong>${!m || m.total === null ? 'nicht bewertbar' : Math.round(m.total) + '/100 · ' + m.color}</strong></p><button class="secondary" onclick="removeProduct(${i})">Entfernen</button></div>`
+        }).join('')
+    }
+    function removeProduct(i) {
+        products.splice(i, 1);
+        try {
+            localStorage.setItem('fc_products', JSON.stringify(products))
+        } catch (e) {}
+        renderCompare()
+    }
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[c]))
+    }
+    $('deleteAll').onclick = () => {
+        if (confirm('Alle Vergleichsprodukte löschen?')) {
+            products = [];
+            try {
+                localStorage.setItem('fc_products', '[]')
+            } catch (e) {}
+            renderCompare()
+        }
+    }
+    $('export').onclick = () => {
+        let csv = ['Produkt;Packung_g;Energie_kcal_100g;Salz_g_100g;Score;Farbklasse', ...products.map(p => {
+            let s = score(p);
+            return [p.name, p.pack, p.kcal, p.salt, s.total === null ? '' : Math.round(s.total), s.color].map(x => String(x ?? '').replaceAll(';', ',')).join(';')
+        })].join('\n');
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], {
+            type: 'text/csv;charset=utf-8'
+        }));
+        a.download = 'foodcheck-vergleich.csv';
+        a.click();
+        URL.revokeObjectURL(a.href)
+    }
+    $('allergenOptions').innerHTML = allergenNames.map(a => `<label style="font-weight:400"><input style="width:auto;margin-right:8px" type="checkbox" value="${a}" ${profile.includes(a) ? 'checked' : ''}>${a}</label>`).join('');
+    $('saveProfile').onclick = () => {
+        profile = [...$('allergenOptions').querySelectorAll('input:checked')].map(x => x.value);
+        try {
+            localStorage.setItem('fc_profile', JSON.stringify(profile))
+        } catch (e) {}
+        alert('Allergieprofil für diese Demo übernommen. Bitte trotzdem immer die Verpackung prüfen.')
+    }
+    // Open Food Facts lookup. Only fields requested; user should verify against current packaging.
+    function setStatus(message, isError=false) {
+        $('scanStatus').textContent = message;
+        $('scanStatus').style.color = isError ? '#b42318' : 'var(--muted)'
+    }
+    function normalizeNumber(v) {
+        if (v === undefined || v === null || v === '' || !Number.isFinite(Number(v)))
+            return null;
+        return Number(v)
+    }
+    function fmt(v) {
+        return Number(v).toLocaleString('de-DE', {
+            maximumFractionDigits: 2
+        })
+    }
+    function firstValue(obj, keys) {
+        for (const k of keys) {
+            if (obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== '')
+                return obj[k]
+        }
+        return null
+    }
+    async function lookupBarcode() {
+        const code = $('barcode').value.trim().replace(/\s/g, '');
+        if (!/^\d{8,14}$/.test(code)) {
+            setStatus('Bitte einen gültigen Barcode mit 8 bis 14 Ziffern eingeben.', true);
+            return
+        }
+        setStatus('Produktdaten werden bei Open Food Facts gesucht …');
+        $('lookupBarcode').disabled = true;
+        try {
+            const url = 'https://world.openfoodfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?fields=code,product_name,product_name_de,brands,quantity,product_quantity,product_quantity_unit,nutriments,ingredients_text,ingredients_text_de,allergens,allergens_tags,traces,traces_tags';
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (!response.ok)
+                throw new Error('Datenbank nicht erreichbar (HTTP ' + response.status + ').');
+            const data = await response.json();
+            if (data.status !== 1 || !data.product) {
+                setStatus('Produkt wurde nicht gefunden. Barcode und Verpackung prüfen; Angaben können manuell eingetragen werden.', true);
+                return
+            }
+            const p = data.product,
+                n = p.nutriments || {};
+            $('barcode').value = p.code || code;
+            $('name').value = firstValue(p, ['product_name_de', 'product_name']) || 'Unbenanntes Produkt';
+            // Packungsmenge und Nährwertbasis anhand der OFF-Einheit gemeinsam übernehmen.
+            const packInfo = offPackInfo(p);
+            const suffix = packInfo.unit === 'ml' ? '_100ml' : '_100g';
+            $('pack').value = packInfo.amount ?? '';
+            $('packUnit').value = packInfo.unit;
+            $('kcal').value = normalizeNumber(n['energy-kcal' + suffix]) ?? '';
+            $('salt').value = normalizeNumber(n['salt' + suffix]) ?? '';
+            $('satfat').value = normalizeNumber(n['saturated-fat' + suffix]) ?? '';
+            $('sugar').value = normalizeNumber(n['sugars' + suffix]) ?? '';
+            $('fiber').value = normalizeNumber(n['fiber' + suffix]) ?? '';
+            $('protein').value = normalizeNumber(n['proteins' + suffix]) ?? '';
+            const ingredients = firstValue(p, ['ingredients_text_de', 'ingredients_text']) || '';
+            const vegParsed = applyVegFromIngredients(ingredients);
+            const allergens = (p.allergens || '') + ' ' + (Array.isArray(p.allergens_tags) ? p.allergens_tags.join(', ') : '') + ' | Spuren: ' + (p.traces || '') + ' ' + (Array.isArray(p.traces_tags) ? p.traces_tags.join(', ') : '') + ' | Zutaten: ' + ingredients;
+            $('allergens').value = allergens.trim();
+            $('dataQuality').value = 'partial';
+            setStatus('Produkt gefunden: ' + $('name').value + '. Packungsmenge und Nährwerte je 100 ' + (packInfo.unit === 'ml' ? 'ml' : 'g') + ' übernommen, bitte mit der aktuellen Verpackung abgleichen.' + (vegParsed ? ' Erkannter Gemüse-Mindestanteil aus bezifferten Zutaten: ' + String(vegParsed.value).replace('.', ',') + ' %.' : ' Kein ausdrücklich bezifferter Gemüseanteil erkannt.'));
+            $('result').innerHTML = resultHtml(getProduct());
+        } catch (e) {
+            setStatus('Abruf fehlgeschlagen: ' + e.message + '. Du kannst den Barcode oder die Nährwerte manuell eingeben.', true)
+        }
+        finally {
+            $('lookupBarcode').disabled = false
+        }
+    }
+    $('lookupBarcode').addEventListener('click', lookupBarcode);
+    let scanStream = null,
+        scanLoop = false;
+    async function startScanner() {
+        if (!('BarcodeDetector' in window)) {
+            setStatus('Dieser Browser unterstützt den integrierten Barcode-Scanner nicht. Gib den Barcode oben manuell ein oder nutze einen Browser/ein Gerät mit BarcodeDetector.', true);
+            return
+        }
+        try {
+            const supported = await BarcodeDetector.getSupportedFormats();
+            const formats = ['ean_13', 'ean_8', 'upc_a', 'upc_e'].filter(x => supported.includes(x));
+            if (!formats.length) {
+                setStatus('Keine kompatiblen EAN/UPC-Formate in diesem Browser verfügbar.', true);
+                return
+            }
+            const detector = new BarcodeDetector({
+                formats
+            });
+            scanStream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: {
+                        ideal: 'environment'
+                    }
+                },
+                audio: false
+            });
+            const video = $('scannerVideo');
+            video.srcObject = scanStream;
+            video.classList.remove('hidden');
+            $('stopScan').classList.remove('hidden');
+            $('startScan').classList.add('hidden');
+            await video.play();
+            scanLoop = true;
+            setStatus('Kamera aktiv. Halte den Barcode ruhig vor die Kamera.');
+            const scan = async () => {
+                if (!scanLoop)
+                    return;
+                try {
+                    const codes = await detector.detect(video);
+                    if (codes.length && codes[0].rawValue) {
+                        $('barcode').value = codes[0].rawValue;
+                        stopScanner();
+                        setStatus('Barcode erkannt. Produktdaten werden gesucht …');
+                        await lookupBarcode();
+                        return
+                    }
+                } catch (e) {}
+                requestAnimationFrame(scan)
+            };
+            requestAnimationFrame(scan);
+        } catch (e) {
+            stopScanner();
+            setStatus('Kamera konnte nicht gestartet werden. Prüfe die Kameraberechtigung und ob die Seite über HTTPS geöffnet ist. ' + e.message, true)
+        }
+    }
+    function stopScanner() {
+        scanLoop = false;
+        if (scanStream) {
+            scanStream.getTracks().forEach(t => t.stop());
+            scanStream = null
+        }
+        const v = $('scannerVideo');
+        v.pause();
+        v.srcObject = null;
+        v.classList.add('hidden');
+        $('stopScan').classList.add('hidden');
+        $('startScan').classList.remove('hidden')
+    }
+    $('startScan').addEventListener('click', startScanner);
+    $('stopScan').addEventListener('click', stopScanner);
+
+    renderCompare();
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http'))
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    </script>
+</body>
+</html>
