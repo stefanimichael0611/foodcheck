@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.0 – Prototyp</title>
+    <title>FoodCheck 1.0.4 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <style>
     :root {
@@ -387,7 +387,7 @@
             </div>
             <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
         </section>
-        <div class="footer">FoodCheck Version 1.0.3 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.0.4 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -475,7 +475,7 @@
                 color: 'Nicht bewertbar'
             };
         let total = keys.reduce((s, k) => s + pts[k] * weights[k], 0);
-        let color = total >= 80 ? 'Grün' : total >= 65 ? 'Blau' : total >= 40 ? 'Gelb' : 'Rot';
+        let color = total >= 85 ? 'Grün' : total >= 70 ? 'Blau' : total >= 40 ? 'Gelb' : 'Rot';
         if (p.salt >= 2)
             color = 'Rot';
         else if (p.salt > 1.5 && ['Grün', 'Blau'].includes(color))
@@ -648,7 +648,7 @@
             m = meal(p),
             a = allergyStatus(p);
         let quality = p.dataQuality === 'verified' ? 'Anhand aktueller Packung geprüft' : p.dataQuality === 'partial' ? 'Teilweise geprüft' : 'Quelle/Daten unklar';
-        return `<div class="score ${s.color.toLowerCase() === 'grün' ? 'green' : s.color.toLowerCase() === 'blau' ? 'blue' : s.color.toLowerCase() === 'gelb' ? 'yellow' : 'red'}"><h3>Ernährungsqualität</h3><div class="big">${s.total === null ? 'Nicht bewertbar' : Math.round(s.total) + '/100 · ' + s.color}</div><small>Prototyp-Score · ${quality}</small>${p.veg !== null && p.vegSource === 'ingredient-minimum' ? '<p><strong>Gemüse-Mindestanteil aus Zutatenliste: ' + fmt(p.veg) + ' %.</strong> Nur ausdrücklich bezifferte Gemüsezutaten wurden addiert; nicht bezifferte Gemüsebestandteile sind nicht enthalten. Grundlage: ' + escapeHtml($('veg').dataset.note || '') + '.</p>' : ''}${s.total === null ? '<p>Pflichtangaben fehlen: ' + Object.entries(points(p)).filter(([k, v]) => v === null).map(([k]) => k).join(', ') + '.</p>' : ''}</div><div class="score ${m && m.total !== null ? m.color.toLowerCase() === 'grün' ? 'green' : m.color.toLowerCase() === 'blau' ? 'blue' : m.color.toLowerCase() === 'gelb' ? 'yellow' : 'red' : 'yellow'}"><h3>Mahlzeitentauglichkeit</h3><div class="big">${!m || m.total === null ? 'Nicht bewertbar' : Math.round(m.total) + '/100 · ' + m.color}</div><small>Bewertung der ganzen Packung · Testmodell, nicht wissenschaftlich validiert</small>${!m ? '<p>Packungsgewicht fehlt. Bitte das Gewicht der ganzen Packung in Gramm eintragen.</p>' : m.total === null ? '<p>Für diese Bewertung fehlen noch: ' + (m.missing || []).join(', ') + '.</p>' : (m.vegUnknown ? '<p>Gemüseanteil unbekannt und deshalb nicht in diese Teilbewertung eingerechnet. Die Ernährungsqualität bleibt davon unabhängig nicht bewertbar.</p>' : '') + mealBreakdownHtml(m)}</div><div class="${a.kind}"><strong>Allergieprüfung</strong><br>${a.text}</div><div class="panel" style="margin-top:14px"><h3>Ähnliche Alternativen</h3><p class="muted">Suche bis zu drei ähnliche Produkte in Open Food Facts. Die Treffer sind zunächst Prüfkandidaten; Produktdaten und Allergene müssen mit der aktuellen Verpackung abgeglichen werden.</p><div class="actions"><button type="button" class="secondary" id="findAlternatives">3 ähnliche Alternativen suchen</button></div><div id="alternativesResult"></div></div><p class="muted">Farben und Punkteskalen sind vorläufige Testregeln. Die aktuelle Verpackung ist maßgeblich.</p>`
+        return `<div class="score ${s.color.toLowerCase() === 'grün' ? 'green' : s.color.toLowerCase() === 'blau' ? 'blue' : s.color.toLowerCase() === 'gelb' ? 'yellow' : 'red'}"><h3>Ernährungsqualität</h3><div class="big">${s.total === null ? 'Nicht bewertbar' : Math.round(s.total) + '/100 · ' + s.color}</div><small>Prototyp-Score · ${quality}</small>${p.veg !== null && p.vegSource === 'ingredient-minimum' ? '<p><strong>Gemüse-Mindestanteil aus Zutatenliste: ' + fmt(p.veg) + ' %.</strong> Nur ausdrücklich bezifferte Gemüsezutaten wurden addiert; nicht bezifferte Gemüsebestandteile sind nicht enthalten. Grundlage: ' + escapeHtml($('veg').dataset.note || '') + '.</p>' : ''}${s.total === null ? '<p>Pflichtangaben fehlen: ' + Object.entries(s.pts).filter(([k, v]) => v === null).map(([k]) => ({salt:'Salz',satfat:'gesättigte Fettsäuren',sugar:'Zucker',kcal:'Energie',fiber:'Ballaststoffe',protein:'Eiweiß',veg:'bestätigter Gemüseanteil'}[k] || k)).join(', ') + '.</p>' : ''}</div><div class="score ${m && m.total !== null ? m.color.toLowerCase() === 'grün' ? 'green' : m.color.toLowerCase() === 'blau' ? 'blue' : m.color.toLowerCase() === 'gelb' ? 'yellow' : 'red' : 'yellow'}"><h3>Mahlzeitentauglichkeit</h3><div class="big">${!m || m.total === null ? 'Nicht bewertbar' : Math.round(m.total) + '/100 · ' + m.color}</div><small>Bewertung der ganzen Packung · Testmodell, nicht wissenschaftlich validiert</small>${!m ? '<p>Packungsgewicht fehlt. Bitte das Gewicht der ganzen Packung in Gramm eintragen.</p>' : m.total === null ? '<p>Für diese Bewertung fehlen noch: ' + (m.missing || []).join(', ') + '.</p>' : (m.vegUnknown ? '<p>Gemüseanteil unbekannt und deshalb nicht in diese Teilbewertung eingerechnet. Die Ernährungsqualität bleibt davon unabhängig nicht bewertbar.</p>' : '') + mealBreakdownHtml(m)}</div><div class="${a.kind}"><strong>Allergieprüfung</strong><br>${a.text}</div><div class="panel" style="margin-top:14px"><h3>Ähnliche Alternativen</h3><p class="muted">Suche bis zu drei ähnliche Produkte in Open Food Facts. Die Treffer sind zunächst Prüfkandidaten; Produktdaten und Allergene müssen mit der aktuellen Verpackung abgeglichen werden.</p><div class="actions"><button type="button" class="secondary" id="findAlternatives">3 ähnliche Alternativen suchen</button></div><div id="alternativesResult"></div></div><p class="muted">Farben und Punkteskalen sind vorläufige Testregeln. Die aktuelle Verpackung ist maßgeblich.</p>`
     }
     // Similar-product discovery (Open Food Facts). Results are candidates, not safety-certified recommendations.
     function offPack(p) {
@@ -663,7 +663,7 @@
         const source = String(text || '').replace(/\s+/g, ' ').trim();
         if (!source)
             return null;
-        const vegTerms = /(tomat|paprika|zwiebel|lauch|porree|spinat|aubergin|zucchin|brokkoli|blumenkohl|karott|möhre|möhr|kürbis|gurk|sellerie|mais|erbs|bohn|pilz|champignon|oliv|artischock|fenchel|rote bete|rande|radieschen|rettich|spargel|grünkohl|wirsing|kohl|mangold|chicorée|knoblauch|peperoni|chili)/i;
+        const vegTerms = /(tomat|paprika|zwiebel|lauch|porree|spinat|aubergin|zucchin|brokkoli|blumenkohl|karott|möhre|möhr|kürbis|gurk|sellerie|mais|erbs|bohn|pilz|champignon|artischock|fenchel|rote bete|rande|radieschen|rettich|spargel|grünkohl|wirsing|kohl|mangold|chicorée|knoblauch|peperoni|chili)/i;
         const segments = source.split(/[,;]+/);
         let total = 0,
             found = [];
