@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.0.5 – Prototyp</title>
+    <title>FoodCheck 1.0.6 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <style>
     :root {
@@ -387,7 +387,7 @@
             </div>
             <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
         </section>
-        <div class="footer">FoodCheck Version 1.0.5 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.0.6 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -612,22 +612,39 @@
                 kind: 'notice',
                 text: 'Kein Allergieprofil ausgewählt. Enthaltene Allergene und mögliche Spuren bitte auf der Verpackung prüfen.'
             };
+
         const {evidence, hits} = allergyMatches(p);
-        if (!p.allergens && !p._allergenTags && !p._tracesTags && !p._ingredients)
-            return {
-                kind: 'allergy',
-                text: 'Allergen- und Zutatenangaben fehlen. Keine Freigabe möglich; Verpackung prüfen.'
-            };
+
+        // Ein erkannter Treffer hat immer Vorrang – auch wenn die Zutatenliste fehlt.
         if (hits.length)
             return {
                 kind: 'allergy',
                 text: 'Nicht geeignet bei deinem Allergieprofil: ' + hits.map(h => h.name + ' (' + h.where + ')').join(', ') + '. Nicht verzehren; aktuelle Verpackung beachten.'
             };
+
+        // Die Zutatenliste wird getrennt von den strukturierten Allergen-Tags geprüft.
+        // Bei Barcode-Daten steht sie in _ingredients bzw. im Abschnitt "| Zutaten:".
+        const rawAllergenField = String(p.allergens || '').trim();
+        const hasStructuredTags = !!(p._allergenTags || p._tracesTags);
+        const hasSectionMarkers = /\\|\\s*(?:Spuren|Zutaten)\\s*:/i.test(rawAllergenField);
+        const ingredients = String(
+            evidence.ingredients ||
+            p._ingredients ||
+            (!hasStructuredTags && !hasSectionMarkers ? rawAllergenField : '')
+        ).trim();
+
+        if (!ingredients)
+            return {
+                kind: 'allergy',
+                text: 'Allergieprüfung unvollständig: Die Zutatenliste fehlt oder ist leer. Keine Freigabe möglich; aktuelle Verpackung prüfen.'
+            };
+
         return {
             kind: 'notice',
             text: 'Kein Treffer in den erfassten Angaben erkannt. Das ist keine Sicherheitsfreigabe: Daten können unvollständig sein; Zutaten und Spurenhinweise auf der Verpackung prüfen.'
         };
     }
+
     function mealBreakdownHtml(m) {
         if (!m || m.total === null)
             return '';
