@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.0.6 – Prototyp</title>
+    <title>FoodCheck 1.0.7 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <style>
     :root {
@@ -387,7 +387,7 @@
             </div>
             <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
         </section>
-        <div class="footer">FoodCheck Version 1.0.6 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.0.7 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -626,7 +626,7 @@
         // Bei Barcode-Daten steht sie in _ingredients bzw. im Abschnitt "| Zutaten:".
         const rawAllergenField = String(p.allergens || '').trim();
         const hasStructuredTags = !!(p._allergenTags || p._tracesTags);
-        const hasSectionMarkers = /\\|\\s*(?:Spuren|Zutaten)\\s*:/i.test(rawAllergenField);
+        const hasSectionMarkers = /\|\s*(?:Spuren|Zutaten)\s*:/i.test(rawAllergenField);
         const ingredients = String(
             evidence.ingredients ||
             p._ingredients ||

@@ -1,4 +1,4 @@
-const CACHE = 'foodcheck-v1-0-6';
+const CACHE = 'foodcheck-v1-0-7';
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
