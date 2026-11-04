@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.0.7 – Prototyp</title>
+    <title>FoodCheck 1.0.8 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <style>
     :root {
@@ -387,7 +387,7 @@
             </div>
             <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
         </section>
-        <div class="footer">FoodCheck Version 1.0.7 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.0.8 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -622,16 +622,14 @@
                 text: 'Nicht geeignet bei deinem Allergieprofil: ' + hits.map(h => h.name + ' (' + h.where + ')').join(', ') + '. Nicht verzehren; aktuelle Verpackung beachten.'
             };
 
-        // Die Zutatenliste wird getrennt von den strukturierten Allergen-Tags geprüft.
-        // Bei Barcode-Daten steht sie in _ingredients bzw. im Abschnitt "| Zutaten:".
+        // Den Zutatenabschnitt aus dem Barcode-Eingabefeld direkt auslesen.
+        // Ein vorhandener, aber leerer "| Zutaten:"-Abschnitt gilt ausdrücklich als fehlende Zutatenliste.
         const rawAllergenField = String(p.allergens || '').trim();
-        const hasStructuredTags = !!(p._allergenTags || p._tracesTags);
-        const hasSectionMarkers = /\|\s*(?:Spuren|Zutaten)\s*:/i.test(rawAllergenField);
-        const ingredients = String(
-            evidence.ingredients ||
-            p._ingredients ||
-            (!hasStructuredTags && !hasSectionMarkers ? rawAllergenField : '')
-        ).trim();
+        const ingredientSection = rawAllergenField.match(/\|\s*Zutaten\s*:\s*([\s\S]*)$/i);
+        const hasIngredientMarker = !!ingredientSection;
+        const ingredients = hasIngredientMarker
+            ? String(ingredientSection[1] || '').trim()
+            : String(evidence.ingredients || p._ingredients || rawAllergenField).trim();
 
         if (!ingredients)
             return {
