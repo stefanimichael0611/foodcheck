@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.4.0 – Prototyp</title>
+    <title>FoodCheck 1.4.1 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -47,6 +47,32 @@
     header p {
         margin: 4px 0 0;
         opacity:.9
+    }
+
+    .headrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        max-width: 820px;
+        margin: auto
+    }
+
+    .sharebtn {
+        background: rgba(255, 255, 255, .16);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, .45);
+        white-space: nowrap;
+        flex-shrink: 0
+    }
+
+    .sharefallback {
+        max-width: 820px;
+        margin: 12px auto 0
+    }
+
+    .sharefallback input {
+        color: var(--ink)
     }
 
     .wrap {
@@ -465,8 +491,21 @@
 </head>
 <body>
     <header>
-        <h1>🥬 FoodCheck</h1>
-        <p>Lebensmittel verstehen. Besser vergleichen.</p>
+        <div class="headrow">
+            <div>
+                <h1>🥬 FoodCheck</h1>
+                <p>Lebensmittel verstehen. Besser vergleichen.</p>
+            </div>
+            <button type="button" class="sharebtn" id="shareApp" aria-label="App teilen">📤 App teilen</button>
+        </div>
+        <div id="shareFallback" class="sharefallback hidden">
+            <p style="margin:0 0 8px">Link zum Weitergeben:</p>
+            <input id="shareLink" readonly>
+            <div class="actions" style="margin-top:8px">
+                <button type="button" class="sharebtn" id="copyShareLink">Link kopieren</button>
+                <button type="button" class="sharebtn" id="closeShare">Schließen</button>
+            </div>
+        </div>
     </header>
     <main class="wrap">
         <div class="notice">
@@ -602,7 +641,7 @@
             </div>
             <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
         </section>
-        <div class="footer">FoodCheck Version 1.4.0 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.4.1 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -2056,6 +2095,45 @@
         $('startScan').classList.add('hidden');
         setStatus('Tipp: „Barcode fotografieren“ öffnet die Handykamera. Der Live-Scan ist nur verfügbar, wenn die App über HTTPS geöffnet wird.');
     }
+
+    // "App teilen": öffnet auf dem Handy das Teilen-Menü (WhatsApp, Nachrichten, Mail …).
+    // Ohne Teilen-Menü (z. B. Desktop-Firefox) wird der Link angezeigt und kann kopiert werden.
+    function appLink() {
+        return location.origin + location.pathname.replace(/index\.html$/, '');
+    }
+    const shareText = 'Probier mal FoodCheck: Barcode von Lebensmitteln scannen und Nutri-Score, Zusatzstoffe, Allergene und bessere Alternativen sehen. Tipp: Auf dem iPhone in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Noch ein Prototyp – bei Allergien bitte immer die Verpackung prüfen.';
+    $('shareApp').addEventListener('click', async () => {
+        const url = appLink();
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'FoodCheck',
+                    text: shareText,
+                    url
+                });
+                return
+            } catch (e) {
+                if (e && e.name === 'AbortError')
+                    return; // Nutzer hat das Teilen-Menü geschlossen.
+            }
+        }
+        $('shareLink').value = url;
+        $('shareFallback').classList.remove('hidden');
+        $('shareLink').select();
+    });
+    $('copyShareLink').addEventListener('click', async () => {
+        const text = shareText + '\n' + $('shareLink').value;
+        try {
+            await navigator.clipboard.writeText(text);
+            $('copyShareLink').textContent = '✓ Kopiert';
+        } catch (e) {
+            $('shareLink').select();
+            document.execCommand && document.execCommand('copy');
+            $('copyShareLink').textContent = '✓ Link markiert';
+        }
+        setTimeout(() => $('copyShareLink').textContent = 'Link kopieren', 2000);
+    });
+    $('closeShare').addEventListener('click', () => $('shareFallback').classList.add('hidden'));
 
     renderCompare();
     renderHistory();
