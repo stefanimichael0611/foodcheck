@@ -1,8 +1,8 @@
-const CACHE = 'foodcheck-v1-0-9';
+const CACHE = 'foodcheck-v1-1-0';
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    await cache.addAll(['./', './index.html', './manifest.json']);
+    await cache.addAll(['./', './index.html', './manifest.json', './icon-180.png', './icon-192.png', './icon-512.png']);
     await self.skipWaiting();
   })());
 });
