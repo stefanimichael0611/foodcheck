@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.3.0 – Prototyp</title>
+    <title>FoodCheck 1.4.0 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -325,6 +325,30 @@
         box-shadow: 0 2px 6px #0003
     }
 
+    .eco .ns { width: 32px; font-size: 14px }
+    .eco-a-plus { background: #1e8a3b }
+    .eco-a { background: #2d9a4b }
+    .eco-b { background: #60ac0e }
+    .eco-c { background: #c9a400 }
+    .eco-d { background: #ff6f1e }
+    .eco-e { background: #df1f1f }
+    .eco-f { background: #8c1414 }
+
+    .famlist {
+        margin: 4px 0 6px;
+        padding-left: 18px
+    }
+
+    .btnlink {
+        display: inline-block;
+        background: var(--green);
+        color: #fff;
+        border-radius: 12px;
+        padding: 10px 14px;
+        text-decoration: none;
+        font-weight: 650
+    }
+
     .nsA { background: #038141 }
     .nsB { background: #85bb2f }
     .nsC { background: #fecb02; color: #1f2925 }
@@ -455,6 +479,10 @@
             <button data-tab="profile">Mein Profil</button>
         </div>
         <section id="check" class="tab panel">
+            <div id="checkForRow" class="hidden" style="margin-bottom:10px">
+                <label for="checkFor" style="margin-top:0">Prüfen für</label>
+                <select id="checkFor"></select>
+            </div>
             <h2>Produktdaten eingeben</h2>
             <p class="muted">Nährwerte je 100 g (bei Getränken je 100 ml) laut aktueller Verpackung. Unbekannte Werte leer lassen.</p>
             <div class="grid">
@@ -548,7 +576,18 @@
             </div>
         </section>
         <section id="profile" class="tab panel hidden">
-            <h2>Allergieprofil</h2>
+            <h2>Familienprofile</h2>
+            <p>Lege für jede Person ein eigenes Profil an. Beim Prüfen kannst du eine Person oder die ganze Familie auswählen.</p>
+            <label for="memberSelect">Profil bearbeiten</label>
+            <div class="grid" style="grid-template-columns:minmax(0,1fr) auto;gap:8px">
+                <select id="memberSelect"></select>
+                <button type="button" class="secondary" id="addMember">+ Person</button>
+            </div>
+            <div class="actions" style="margin-top:8px">
+                <button type="button" class="secondary" id="renameMember">Umbenennen</button>
+                <button type="button" class="secondary" id="deleteMember">Löschen</button>
+            </div>
+            <h2 style="margin-top:20px">Allergien</h2>
             <p>Wähle Allergene aus, die FoodCheck markieren soll. Standardmäßig gelten auch Spurenhinweise („Kann … enthalten“) als Treffer. Wenn Spuren für dich unbedenklich sind, setze zusätzlich „Spuren ok“.</p>
             <div id="allergenOptions"></div>
             <h2 style="margin-top:20px">Ernährungsvorlieben</h2>
@@ -563,7 +602,7 @@
             </div>
             <p class="notice">Wichtig: Ein Treffer oder unklarer Text muss immer manuell geprüft werden. „Nicht gefunden“ bedeutet nicht „sicher frei“. Die aktuelle Verpackung ist maßgeblich.</p>
         </section>
-        <div class="footer">FoodCheck Version 1.3.0 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.4.0 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -593,6 +632,50 @@
             ...JSON.parse(localStorage.getItem('fc_diet') || '{}')
         }
     } catch (e) {}
+
+    // Familienprofile: jede Person hat eigene Allergene, "Spuren ok" und Ernährungsvorlieben.
+    // Die Prüffunktionen arbeiten mit profile/traceOk/dietPrefs; withMember() setzt diese je Person.
+    let family = [];
+    try {
+        family = JSON.parse(localStorage.getItem('fc_family') || '[]')
+    } catch (e) {}
+    if (!Array.isArray(family) || !family.length) {
+        // Übernahme des bisherigen Einzelprofils (Version 1.3.0 und älter).
+        family = [{
+            id: 'm' + Date.now(),
+            name: 'Ich',
+            allergens: profile,
+            traceOk,
+            diet: dietPrefs
+        }];
+    }
+    let activeMember = 'all';
+    try {
+        activeMember = localStorage.getItem('fc_active') || 'all'
+    } catch (e) {}
+    function saveFamily() {
+        try {
+            localStorage.setItem('fc_family', JSON.stringify(family));
+            localStorage.setItem('fc_active', activeMember)
+        } catch (e) {}
+    }
+    function selectedMembers() {
+        if (activeMember === 'all')
+            return family;
+        const m = family.find(x => x.id === activeMember);
+        return m ? [m] : family;
+    }
+    function withMember(m, fn) {
+        const saved = [profile, traceOk, dietPrefs];
+        profile = m.allergens || [];
+        traceOk = m.traceOk || [];
+        dietPrefs = m.diet || {};
+        try {
+            return fn()
+        } finally {
+            [profile, traceOk, dietPrefs] = saved
+        }
+    }
     document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
         document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('active', x === b));
         document.querySelectorAll('.tab').forEach(s => s.classList.toggle('hidden', s.id !== b.dataset.tab));
@@ -673,13 +756,38 @@
             nova: [1, 2, 3, 4].includes(Number(p.nova_group)) ? Number(p.nova_group) : null,
             additives,
             additivesKnown: Array.isArray(p.additives_tags),
-            analysis: Array.isArray(p.ingredients_analysis_tags) ? p.ingredients_analysis_tags : []
+            analysis: Array.isArray(p.ingredients_analysis_tags) ? p.ingredients_analysis_tags : [],
+            eco: ['a-plus', 'a', 'b', 'c', 'd', 'e', 'f'].includes(String(p.ecoscore_grade || '').toLowerCase()) ? String(p.ecoscore_grade).toLowerCase() : (String(p.ecoscore_grade || '') === 'not-applicable' ? 'na' : null)
         };
+    }
+    function ecoHtml(m) {
+        if (!m.eco)
+            return '<p class="muted">Kein Green-Score in der Datenbank.</p>';
+        if (m.eco === 'na')
+            return '<p class="muted">Für diese Produktart wird kein Green-Score berechnet (z. B. Wasser, Softdrinks).</p>';
+        const grades = ['a-plus', 'a', 'b', 'c', 'd', 'e', 'f'];
+        const label = g => g === 'a-plus' ? 'A+' : g.toUpperCase();
+        const text = {
+            'a-plus': 'sehr geringe Umweltwirkung',
+            a: 'sehr geringe Umweltwirkung',
+            b: 'geringe Umweltwirkung',
+            c: 'mittlere Umweltwirkung',
+            d: 'hohe Umweltwirkung',
+            e: 'sehr hohe Umweltwirkung',
+            f: 'sehr hohe Umweltwirkung'
+        };
+        return `<div class="nutri eco">${grades.map(g => `<span class="ns eco-${g}${g === m.eco ? ' on' : ''}">${label(g)}</span>`).join('')}</div><p>${text[m.eco]}</p>`;
+    }
+    function offProductLink(code, edit) {
+        return 'https://de.openfoodfacts.org/cgi/product.pl?type=' + (edit ? 'edit' : 'search_or_add&action=process') + '&code=' + encodeURIComponent(code);
+    }
+    function reportBoxHtml(code) {
+        return `<div class="alertbig neutral"><strong class="alerthead">Produkt nicht in der Datenbank</strong>Hilf mit und trage es bei Open Food Facts ein – dann kann FoodCheck es beim nächsten Scan bewerten (für alle Nutzer).<p><a class="btnlink" href="${offProductLink(code, false)}" target="_blank" rel="noopener">Bei Open Food Facts eintragen ↗</a></p><small>Dafür brauchst du ein kostenloses Open-Food-Facts-Konto. Am einfachsten geht es mit der Open-Food-Facts-App: Barcode scannen und Fotos von Vorderseite, Zutatenliste und Nährwerttabelle machen. Bis dahin kannst du die Werte unten von Hand eintragen.</small></div>`;
     }
     function metaHtml(p) {
         const m = p.meta;
         if (!m)
-            return '<div class="panel" style="margin-top:14px"><h3>Nutri-Score, Verarbeitung & Zusatzstoffe</h3><p class="muted">Diese Angaben gibt es nur, wenn das Produkt per Barcode aus Open Food Facts geladen wurde.</p></div>';
+            return '<div class="panel" style="margin-top:14px"><h3>Nutri-Score, Verarbeitung, Zusatzstoffe & Umwelt</h3><p class="muted">Diese Angaben gibt es nur, wenn das Produkt per Barcode aus Open Food Facts geladen wurde.</p></div>';
         const novaText = {
             1: 'unverarbeitet oder minimal verarbeitet',
             2: 'verarbeitete Küchenzutat',
@@ -689,7 +797,7 @@
         const ns = m.nutriscore ? `<div class="nutri">${'ABCDE'.split('').map(g => `<span class="ns ns${g}${g === m.nutriscore ? ' on' : ''}">${g}</span>`).join('')}</div>` : '<p class="muted">Kein Nutri-Score in der Datenbank.</p>';
         const nova = m.nova ? `<p><span class="novabadge nova${m.nova}">${m.nova}</span> <strong>NOVA ${m.nova}:</strong> ${novaText[m.nova]}</p>` : '<p class="muted">Keine NOVA-Gruppe in der Datenbank.</p>';
         const add = !m.additivesKnown ? '<p class="muted">Keine Angaben zu Zusatzstoffen in der Datenbank.</p>' : m.additives.length ? `<p><strong>${m.additives.length} Zusatzstoff${m.additives.length === 1 ? '' : 'e'}:</strong></p><p>${m.additives.map(a => `<span class="altbadge">${escapeHtml(a.name)}</span>`).join('')}</p>` : '<p><strong>Keine Zusatzstoffe</strong> erkannt.</p>';
-        return `<div class="panel" style="margin-top:14px"><h3>Nutri-Score, Verarbeitung & Zusatzstoffe</h3><div class="altsection">Nutri-Score</div>${ns}<div class="altsection">Verarbeitungsgrad (NOVA)</div>${nova}<div class="altsection">Zusatzstoffe</div>${add}<p class="muted">Werte aus Open Food Facts, automatisch aus Zutaten und Nährwerten berechnet. Zusatzstoffe sind in der EU zugelassen; die Anzahl allein sagt nichts über ein Gesundheitsrisiko.</p></div>`;
+        return `<div class="panel" style="margin-top:14px"><h3>Nutri-Score, Verarbeitung, Zusatzstoffe & Umwelt</h3><div class="altsection">Nutri-Score</div>${ns}<div class="altsection">Verarbeitungsgrad (NOVA)</div>${nova}<div class="altsection">Zusatzstoffe</div>${add}<div class="altsection">Umwelt (Green-Score)</div>${ecoHtml(m)}<p class="muted">Werte aus Open Food Facts, automatisch aus Zutaten, Nährwerten und Herkunftsangaben berechnet. Zusatzstoffe sind in der EU zugelassen; die Anzahl allein sagt nichts über ein Gesundheitsrisiko.</p>${p.barcode ? `<p><a href="${offProductLink(p.barcode, true)}" target="_blank" rel="noopener">Fehlende oder falsche Angaben? Bei Open Food Facts ergänzen ↗</a></p>` : ''}</div>`;
     }
 
     // Ernährungsvorlieben (vegan, vegetarisch, ohne Palmöl) anhand der automatischen Zutatenanalyse von Open Food Facts.
@@ -727,11 +835,12 @@
             items
         };
     }
-    function dietBannerHtml(p) {
+    function dietBannerHtml(p, who) {
         const d = dietStatus(p);
         if (!d)
             return '';
-        const head = d.level === 'bad' ? '⚠️ Passt nicht zu deinen Ernährungsvorlieben' : d.level === 'unsure' ? 'Ernährungsvorlieben: nicht eindeutig' : '✓ Passt zu deinen Ernährungsvorlieben';
+        const forWho = who ? ' – ' + escapeHtml(who) : '';
+        const head = (d.level === 'bad' ? '⚠️ Passt nicht zu deinen Ernährungsvorlieben' : d.level === 'unsure' ? 'Ernährungsvorlieben: nicht eindeutig' : '✓ Passt zu deinen Ernährungsvorlieben') + forWho;
         const cls = d.level === 'bad' ? 'danger' : d.level === 'unsure' ? 'caution' : 'good';
         return `<div class="alertbig ${cls}"><strong class="alerthead">${head}</strong>${d.items.map(i => escapeHtml(i.text)).join(' · ')}<br><small>Automatisch aus der Zutatenliste ermittelt – bei Unsicherheit Verpackung und Siegel prüfen.</small></div>`;
     }
@@ -980,18 +1089,51 @@
         return `<h3 style="margin-top:14px">So entstehen die Punkte</h3><p class="muted">Alle Mengen beziehen sich auf die ganze Packung. Der Einzelwert wird mit seiner Gewichtung verrechnet; die verbleibenden Gewichte werden auf 100 % normiert, ${m.vegUnknown ? 'weil der Gemüseanteil unbekannt ist.' : 'Der Gemüseanteil ist bekannt und fließt nicht in diese separate Packungsbewertung ein.'}</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:7px;border-bottom:1px solid var(--line)">Kriterium</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Menge</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Einzelwert</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Gewichtung</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Punktebeitrag</th></tr></thead><tbody>${rows.map(([label, key, unit, pts, w]) => `<tr><td style="padding:7px;border-bottom:1px solid var(--line)">${label}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(m.vals[key])} ${unit}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts)}/100</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${Math.round(w * 100)} %</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts * w)} P.</td></tr>`).join('')}</tbody></table></div><p><strong>Berechnung:</strong> ungekürzte gewichtete Beiträge addieren (${fmt(rows.reduce((sum, row) => sum + row[3] * row[4], 0))} Punkte); anschließend durch die Summe der berücksichtigten Gewichte (80 %) teilen. Ergebnis: ${fmt(m.total)} → gerundet ${Math.round(m.total)}/100.</p><p class="muted">Hinweis: Das ist die derzeitige vorläufige FoodCheck-Testformel Version 0.6, keine medizinisch oder wissenschaftlich validierte Ernährungsbewertung.</p>`;
     }
     // Allergie-Ergebnis als gut sichtbarer Kasten ganz oben – direkt nach dem Scan.
-    function allergyBannerHtml(a) {
+    function allergyBannerHtml(a, who) {
+        const forWho = who ? ' – ' + escapeHtml(who) : '';
         if (a.level === 'noprofile')
-            return `<div class="alertbig neutral"><strong>Allergieprüfung</strong><br>${a.text} <button type="button" class="linkbtn" data-goto="profile">Allergieprofil anlegen</button></div>`;
+            return `<div class="alertbig neutral"><strong>Allergieprüfung${forWho}</strong><br>${a.text} <button type="button" class="linkbtn" data-goto="profile">Allergieprofil anlegen</button></div>`;
         const head = a.level === 'hit' ? '⚠️ Achtung – Allergen aus deinem Profil' : a.level === 'incomplete' ? '⚠️ Allergieprüfung unvollständig' : 'Kein Allergen aus deinem Profil erkannt';
-        return `<div class="alertbig ${a.level === 'none' ? 'caution' : 'danger'}" role="alert"><strong class="alerthead">${head}</strong>${a.text}</div>`;
+        return `<div class="alertbig ${a.level === 'none' ? 'caution' : 'danger'}" role="alert"><strong class="alerthead">${head}${forWho}</strong>${a.text}</div>`;
+    }
+    // Warnkästen für die ausgewählte(n) Person(en). Bei "Ganze Familie" eine Zeile je Person, Farbe nach dem schlimmsten Ergebnis.
+    function familyBannersHtml(p) {
+        const members = selectedMembers();
+        if (members.length === 1) {
+            const m = members[0],
+                who = family.length > 1 ? m.name : '';
+            return withMember(m, () => allergyBannerHtml(allergyStatus(p), who) + dietBannerHtml(p, who));
+        }
+        const rank = {
+            hit: 3,
+            incomplete: 2,
+            none: 1,
+            noprofile: 0
+        };
+        const rows = members.map(m => ({
+            m,
+            a: withMember(m, () => allergyStatus(p)),
+            d: withMember(m, () => dietStatus(p))
+        }));
+        const worst = rows.reduce((w, r) => rank[r.a.level] > rank[w] ? r.a.level : w, 'noprofile');
+        const short = r => r.a.level === 'hit' ? '⚠️ ' + r.a.text.replace('Nicht geeignet bei deinem Allergieprofil: ', 'nicht geeignet: ').replace(' Nicht verzehren; aktuelle Verpackung beachten.', '') : r.a.level === 'incomplete' ? '⚠️ Prüfung unvollständig (Zutatenliste fehlt)' : r.a.level === 'none' ? 'kein Allergen erkannt' + (/Spuren von/.test(r.a.text) ? ' (tolerierte Spuren möglich)' : '') : 'kein Allergieprofil';
+        const head = worst === 'hit' ? '⚠️ Achtung – nicht für alle geeignet' : worst === 'incomplete' ? '⚠️ Allergieprüfung unvollständig' : worst === 'none' ? 'Kein Allergen aus euren Profilen erkannt' : 'Allergieprüfung';
+        const cls = worst === 'hit' || worst === 'incomplete' ? 'danger' : worst === 'none' ? 'caution' : 'neutral';
+        let html = `<div class="alertbig ${cls}" role="alert"><strong class="alerthead">${head} (Familie)</strong><ul class="famlist">${rows.map(r => `<li><strong>${escapeHtml(r.m.name)}:</strong> ${escapeHtml(short(r))}</li>`).join('')}</ul>${worst === 'none' ? '<small>Keine Sicherheitsfreigabe: Zutaten und Spurenhinweise auf der Verpackung prüfen.</small>' : ''}</div>`;
+        const dietRows = rows.filter(r => r.d);
+        if (dietRows.length) {
+            const dw = dietRows.some(r => r.d.level === 'bad') ? 'bad' : dietRows.some(r => r.d.level === 'unsure') ? 'unsure' : 'ok';
+            const dhead = dw === 'bad' ? '⚠️ Passt nicht zu allen Ernährungsvorlieben' : dw === 'unsure' ? 'Ernährungsvorlieben: nicht eindeutig' : '✓ Passt zu allen Ernährungsvorlieben';
+            html += `<div class="alertbig ${dw === 'bad' ? 'danger' : dw === 'unsure' ? 'caution' : 'good'}"><strong class="alerthead">${dhead}</strong><ul class="famlist">${dietRows.map(r => `<li><strong>${escapeHtml(r.m.name)}:</strong> ${escapeHtml(r.d.items.map(i => i.text).join(' · '))}</li>`).join('')}</ul><small>Automatisch aus der Zutatenliste ermittelt – bei Unsicherheit Verpackung und Siegel prüfen.</small></div>`;
+        }
+        return html;
     }
     function resultHtml(p) {
         let s = score(p),
             m = meal(p),
             a = allergyStatus(p);
         let quality = p.dataQuality === 'verified' ? 'Anhand aktueller Packung geprüft' : p.dataQuality === 'partial' ? 'Teilweise geprüft' : 'Quelle/Daten unklar';
-        return allergyBannerHtml(a) + dietBannerHtml(p) + drinkHtml(p) + `<div class="score ${s.color.toLowerCase() === 'grün' ? 'green' : s.color.toLowerCase() === 'blau' ? 'blue' : s.color.toLowerCase() === 'gelb' ? 'yellow' : 'red'}"><h3>Ernährungsqualität</h3><div class="big">${s.total === null ? 'Nicht bewertbar' : Math.round(s.total) + '/100 · ' + s.color}</div><small>Prototyp-Score · ${quality}</small>${p.veg !== null && p.vegSource === 'ingredient-minimum' ? '<p><strong>Gemüse-Mindestanteil aus Zutatenliste: ' + fmt(p.veg) + ' %.</strong> Nur ausdrücklich bezifferte Gemüsezutaten wurden addiert; nicht bezifferte Gemüsebestandteile sind nicht enthalten. Dieser Mindestwert ist kein bestätigter Gemüseanteil und wird deshalb nicht bewertet. Grundlage: ' + escapeHtml($('veg').dataset.note || '') + '.</p>' : ''}${s.vegUnknown && s.total !== null ? '<p>Ohne Gemüseanteil berechnet: Der bestätigte Gemüseanteil ist unbekannt. Er wird nicht geschätzt; die übrigen sechs Kriterien werden auf 100 % hochgerechnet (sonst 20 % Gewicht für Gemüse). Wer einen geprüften Wert von der Verpackung kennt, kann ihn oben eintragen.</p>' : ''}${s.total === null ? '<p>Pflichtangaben fehlen: ' + Object.entries(s.pts).filter(([k, v]) => v === null && k !== 'veg').map(([k]) => ({salt:'Salz',satfat:'gesättigte Fettsäuren',sugar:'Zucker',kcal:'Energie',fiber:'Ballaststoffe',protein:'Eiweiß',veg:'bestätigter Gemüseanteil'}[k] || k)).join(', ') + '.</p>' : ''}</div><div class="score ${m && m.total !== null ? m.color.toLowerCase() === 'grün' ? 'green' : m.color.toLowerCase() === 'blau' ? 'blue' : m.color.toLowerCase() === 'gelb' ? 'yellow' : 'red' : 'yellow'}"><h3>Mahlzeitentauglichkeit</h3><div class="big">${!m || m.total === null ? 'Nicht bewertbar' : Math.round(m.total) + '/100 · ' + m.color}</div><small>Bewertung der ganzen Packung · Testmodell, nicht wissenschaftlich validiert</small>${!m ? '<p>Packungsgewicht fehlt. Bitte das Gewicht der ganzen Packung in Gramm eintragen.</p>' : m.total === null ? '<p>Für diese Bewertung fehlen noch: ' + (m.missing || []).join(', ') + '.</p>' : (m.vegUnknown ? '<p>Gemüseanteil unbekannt und deshalb nicht in diese Teilbewertung eingerechnet.</p>' : '') + mealBreakdownHtml(m)}</div>${metaHtml(p)}<div class="panel" style="margin-top:14px"><h3>Ähnliche Alternativen</h3><p class="muted">Suche bis zu drei ähnliche Produkte in Open Food Facts. Die Treffer sind zunächst Prüfkandidaten; Produktdaten und Allergene müssen mit der aktuellen Verpackung abgeglichen werden.</p><div class="actions"><button type="button" class="secondary" id="findAlternatives">3 ähnliche Alternativen suchen</button></div><div id="alternativesResult"></div></div><p class="muted">Farben und Punkteskalen sind vorläufige Testregeln. Die aktuelle Verpackung ist maßgeblich.</p>`
+        return familyBannersHtml(p) + drinkHtml(p) + `<div class="score ${s.color.toLowerCase() === 'grün' ? 'green' : s.color.toLowerCase() === 'blau' ? 'blue' : s.color.toLowerCase() === 'gelb' ? 'yellow' : 'red'}"><h3>Ernährungsqualität</h3><div class="big">${s.total === null ? 'Nicht bewertbar' : Math.round(s.total) + '/100 · ' + s.color}</div><small>Prototyp-Score · ${quality}</small>${p.veg !== null && p.vegSource === 'ingredient-minimum' ? '<p><strong>Gemüse-Mindestanteil aus Zutatenliste: ' + fmt(p.veg) + ' %.</strong> Nur ausdrücklich bezifferte Gemüsezutaten wurden addiert; nicht bezifferte Gemüsebestandteile sind nicht enthalten. Dieser Mindestwert ist kein bestätigter Gemüseanteil und wird deshalb nicht bewertet. Grundlage: ' + escapeHtml($('veg').dataset.note || '') + '.</p>' : ''}${s.vegUnknown && s.total !== null ? '<p>Ohne Gemüseanteil berechnet: Der bestätigte Gemüseanteil ist unbekannt. Er wird nicht geschätzt; die übrigen sechs Kriterien werden auf 100 % hochgerechnet (sonst 20 % Gewicht für Gemüse). Wer einen geprüften Wert von der Verpackung kennt, kann ihn oben eintragen.</p>' : ''}${s.total === null ? '<p>Pflichtangaben fehlen: ' + Object.entries(s.pts).filter(([k, v]) => v === null && k !== 'veg').map(([k]) => ({salt:'Salz',satfat:'gesättigte Fettsäuren',sugar:'Zucker',kcal:'Energie',fiber:'Ballaststoffe',protein:'Eiweiß',veg:'bestätigter Gemüseanteil'}[k] || k)).join(', ') + '.</p>' : ''}</div><div class="score ${m && m.total !== null ? m.color.toLowerCase() === 'grün' ? 'green' : m.color.toLowerCase() === 'blau' ? 'blue' : m.color.toLowerCase() === 'gelb' ? 'yellow' : 'red' : 'yellow'}"><h3>Mahlzeitentauglichkeit</h3><div class="big">${!m || m.total === null ? 'Nicht bewertbar' : Math.round(m.total) + '/100 · ' + m.color}</div><small>Bewertung der ganzen Packung · Testmodell, nicht wissenschaftlich validiert</small>${!m ? '<p>Packungsgewicht fehlt. Bitte das Gewicht der ganzen Packung in Gramm eintragen.</p>' : m.total === null ? '<p>Für diese Bewertung fehlen noch: ' + (m.missing || []).join(', ') + '.</p>' : (m.vegUnknown ? '<p>Gemüseanteil unbekannt und deshalb nicht in diese Teilbewertung eingerechnet.</p>' : '') + mealBreakdownHtml(m)}</div>${metaHtml(p)}<div class="panel" style="margin-top:14px"><h3>Ähnliche Alternativen</h3><p class="muted">Suche bis zu drei ähnliche Produkte in Open Food Facts. Die Treffer sind zunächst Prüfkandidaten; Produktdaten und Allergene müssen mit der aktuellen Verpackung abgeglichen werden.</p><div class="actions"><button type="button" class="secondary" id="findAlternatives">3 ähnliche Alternativen suchen</button></div><div id="alternativesResult"></div></div><p class="muted">Farben und Punkteskalen sind vorläufige Testregeln. Die aktuelle Verpackung ist maßgeblich.</p>`
     }
     // Similar-product discovery (Open Food Facts). Results are candidates, not safety-certified recommendations.
     function offPackInfo(p) {
@@ -1101,6 +1243,24 @@
             _allergenTags: (p.allergens_tags || []).join(' '),
             _tracesTags: (p.traces_tags || []).join(' ')
         };
+    }
+    // Alternativen: blockiert, sobald eine der ausgewählten Personen betroffen ist.
+    function candidateAllergyFamily(p) {
+        const results = selectedMembers().map(m => ({
+            m,
+            r: withMember(m, () => candidateAllergy(p))
+        }));
+        const withProf = results.filter(x => (x.m.allergens || []).length);
+        if (!withProf.length)
+            return results[0].r;
+        const hitOnes = withProf.filter(x => x.r.label.startsWith('Nicht geeignet'));
+        if (hitOnes.length)
+            return {
+                blocked: true,
+                kind: 'altblocked',
+                label: hitOnes.map(x => (family.length > 1 ? x.m.name + ': ' : '') + x.r.label).join(' ')
+            };
+        return withProf[0].r;
     }
     function candidateAllergy(p) {
         if (!profile.length)
@@ -1221,7 +1381,7 @@
                     return {
                         ...p,
                         mealResult: r,
-                        allergy: candidateAllergy(p)
+                        allergy: candidateAllergyFamily(p)
                     }
                 }).filter(p => p.mealResult && p.mealResult.total !== null);
                 for (const p of scored) {
@@ -1319,7 +1479,7 @@
     function showResult(p) {
         $('result').innerHTML = resultHtml(p);
         const ns = p.meta && p.meta.nutriscore ? ' · Nutri-Score ' + p.meta.nutriscore : '';
-        $('quickAllergy').innerHTML = allergyBannerHtml(allergyStatus(p)) + dietBannerHtml(p) + '<p><button type="button" class="linkbtn" id="jumpResult">↓ Zur Bewertung von „' + escapeHtml(p.name) + '“' + ns + '</button></p>';
+        $('quickAllergy').innerHTML = familyBannersHtml(p) + '<p><button type="button" class="linkbtn" id="jumpResult">↓ Zur Bewertung von „' + escapeHtml(p.name) + '“' + ns + '</button></p>';
     }
 
     // Verlauf: die letzten 10 per Barcode geladenen Produkte, lokal auf dem Gerät gespeichert.
@@ -1482,7 +1642,34 @@
         a.click();
         URL.revokeObjectURL(a.href)
     }
-    $('allergenOptions').innerHTML = allergenNames.map(a => `<div class="allergenrow"><label class="prefrow"><input type="checkbox" data-allergen="${a}" ${profile.includes(a) ? 'checked' : ''}> ${a}</label><label class="traceopt${profile.includes(a) ? '' : ' off'}"><input type="checkbox" data-trace="${a}" ${traceOk.includes(a) ? 'checked' : ''} ${profile.includes(a) ? '' : 'disabled'}> Spuren ok</label></div>`).join('');
+    // ---------- Profilseite (Familienprofile) ----------
+    let editMemberId = (selectedMembers()[0] || family[0]).id;
+    function editMember() {
+        return family.find(m => m.id === editMemberId) || family[0];
+    }
+    function renderMemberForm() {
+        const m = editMember();
+        editMemberId = m.id;
+        $('memberSelect').innerHTML = family.map(x => `<option value="${escapeHtml(x.id)}" ${x.id === m.id ? 'selected' : ''}>${escapeHtml(x.name)}</option>`).join('');
+        $('deleteMember').disabled = family.length < 2;
+        const al = m.allergens || [],
+            tr = m.traceOk || [];
+        $('allergenOptions').innerHTML = allergenNames.map(a => `<div class="allergenrow"><label class="prefrow"><input type="checkbox" data-allergen="${a}" ${al.includes(a) ? 'checked' : ''}> ${a}</label><label class="traceopt${al.includes(a) ? '' : ' off'}"><input type="checkbox" data-trace="${a}" ${tr.includes(a) ? 'checked' : ''} ${al.includes(a) ? '' : 'disabled'}> Spuren ok</label></div>`).join('');
+        $('dietOptions').querySelectorAll('input').forEach(i => i.checked = !!(m.diet || {})[i.value]);
+        $('saveProfile').textContent = 'Profil von ' + m.name + ' speichern';
+    }
+    // Auswahl "Prüfen für" im Tab "Produkt prüfen".
+    function renderCheckFor() {
+        $('checkForRow').classList.toggle('hidden', family.length < 2);
+        if (activeMember !== 'all' && !family.some(m => m.id === activeMember))
+            activeMember = 'all';
+        $('checkFor').innerHTML = family.map(m => `<option value="${escapeHtml(m.id)}">${escapeHtml(m.name)}</option>`).join('') + '<option value="all">Ganze Familie</option>';
+        $('checkFor').value = family.length < 2 ? family[0].id : activeMember;
+    }
+    function refreshShownProduct() {
+        if ($('result').innerHTML.trim())
+            showResult(getProduct());
+    }
     // "Spuren ok" ist nur bei ausgewähltem Allergen bedienbar.
     $('allergenOptions').addEventListener('change', e => {
         const name = e.target.dataset.allergen;
@@ -1494,22 +1681,70 @@
             t.checked = false;
         t.closest('.traceopt').classList.toggle('off', !e.target.checked);
     });
-    $('dietOptions').querySelectorAll('input').forEach(i => i.checked = !!dietPrefs[i.value]);
+    $('memberSelect').addEventListener('change', () => {
+        editMemberId = $('memberSelect').value;
+        renderMemberForm();
+    });
+    $('addMember').addEventListener('click', () => {
+        const name = (prompt('Name der Person:') || '').trim();
+        if (!name)
+            return;
+        const m = {
+            id: 'm' + Date.now(),
+            name: name.slice(0, 30),
+            allergens: [],
+            traceOk: [],
+            diet: {}
+        };
+        family.push(m);
+        editMemberId = m.id;
+        saveFamily();
+        renderMemberForm();
+        renderCheckFor();
+        refreshShownProduct();
+    });
+    $('renameMember').addEventListener('click', () => {
+        const m = editMember();
+        const name = (prompt('Neuer Name:', m.name) || '').trim();
+        if (!name)
+            return;
+        m.name = name.slice(0, 30);
+        saveFamily();
+        renderMemberForm();
+        renderCheckFor();
+        refreshShownProduct();
+    });
+    $('deleteMember').addEventListener('click', () => {
+        const m = editMember();
+        if (family.length < 2 || !confirm('Profil von ' + m.name + ' löschen?'))
+            return;
+        family = family.filter(x => x.id !== m.id);
+        if (activeMember === m.id)
+            activeMember = 'all';
+        editMemberId = family[0].id;
+        saveFamily();
+        renderMemberForm();
+        renderCheckFor();
+        refreshShownProduct();
+    });
+    $('checkFor').addEventListener('change', () => {
+        activeMember = $('checkFor').value;
+        saveFamily();
+        refreshShownProduct();
+    });
     $('saveProfile').onclick = () => {
-        profile = [...$('allergenOptions').querySelectorAll('input[data-allergen]:checked')].map(x => x.dataset.allergen);
-        traceOk = [...$('allergenOptions').querySelectorAll('input[data-trace]:checked')].map(x => x.dataset.trace).filter(a => profile.includes(a));
-        dietPrefs = {};
-        $('dietOptions').querySelectorAll('input').forEach(i => dietPrefs[i.value] = i.checked);
-        try {
-            localStorage.setItem('fc_profile', JSON.stringify(profile));
-            localStorage.setItem('fc_traceok', JSON.stringify(traceOk));
-            localStorage.setItem('fc_diet', JSON.stringify(dietPrefs))
-        } catch (e) {}
+        const m = editMember();
+        m.allergens = [...$('allergenOptions').querySelectorAll('input[data-allergen]:checked')].map(x => x.dataset.allergen);
+        m.traceOk = [...$('allergenOptions').querySelectorAll('input[data-trace]:checked')].map(x => x.dataset.trace).filter(a => m.allergens.includes(a));
+        m.diet = {};
+        $('dietOptions').querySelectorAll('input').forEach(i => m.diet[i.value] = i.checked);
+        saveFamily();
         // Ein bereits angezeigtes Produkt sofort mit dem neuen Profil neu prüfen.
-        if ($('result').innerHTML.trim())
-            showResult(getProduct());
-        alert('Profil gespeichert. Bitte trotzdem immer die Verpackung prüfen.')
+        refreshShownProduct();
+        alert('Profil von ' + m.name + ' gespeichert. Bitte trotzdem immer die Verpackung prüfen.')
     }
+    renderMemberForm();
+    renderCheckFor();
     // Open Food Facts lookup. Only fields requested; user should verify against current packaging.
     function setStatus(message, isError=false) {
         $('scanStatus').textContent = message;
@@ -1543,17 +1778,22 @@
         delete $('barcode').dataset.meta;
         $('lookupBarcode').disabled = true;
         try {
-            const url = 'https://world.openfoodfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?fields=code,product_name,product_name_de,brands,quantity,product_quantity,product_quantity_unit,nutriments,ingredients_text,ingredients_text_de,allergens,allergens_tags,traces,traces_tags,categories_tags,nutriscore_grade,nova_group,additives_tags,ingredients_analysis_tags';
+            const url = 'https://world.openfoodfacts.org/api/v2/product/' + encodeURIComponent(code) + '.json?fields=code,product_name,product_name_de,brands,quantity,product_quantity,product_quantity_unit,nutriments,ingredients_text,ingredients_text_de,allergens,allergens_tags,traces,traces_tags,categories_tags,nutriscore_grade,nova_group,additives_tags,ingredients_analysis_tags,ecoscore_grade';
             const response = await fetch(url, {
                 headers: {
                     'Accept': 'application/json'
                 }
             });
-            if (!response.ok)
+            // Unbekannte Produkte beantwortet Open Food Facts mit HTTP 404 – das ist kein Verbindungsfehler.
+            if (!response.ok && response.status !== 404)
                 throw new Error('Datenbank nicht erreichbar (HTTP ' + response.status + ').');
-            const data = await response.json();
+            const data = response.status === 404 ? {
+                status: 0
+            } : await response.json();
             if (data.status !== 1 || !data.product) {
                 setStatus('Produkt wurde nicht gefunden. Barcode und Verpackung prüfen; Angaben können manuell eingetragen werden.', true);
+                $('quickAllergy').innerHTML = reportBoxHtml(code);
+                $('result').innerHTML = '';
                 return
             }
             const p = data.product,
