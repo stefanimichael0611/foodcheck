@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.8.0 – Prototyp</title>
+    <title>FoodCheck 1.8.2 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -839,7 +839,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">FoodCheck Version 1.8.0 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.8.2 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -1402,9 +1402,20 @@
     }
     function offPack(p) { return offPackInfo(p).amount; }
     // Open Food Facts speichert Getränke-Nährwerte oft nur unter "_100g" (gemeint ist dann je 100 ml).
+    // Nährwerte auf eine Nachkommastelle runden (Open Food Facts liefert oft errechnete Werte mit vielen Stellen).
+    // Salz behält zwei Nachkommastellen, weil die Ampelgrenzen dort fein sind (0,3 g / 1,5 g).
+    function round1(v, key) {
+        const f = key === 'salt' ? 100 : 10;
+        return v === null || v === undefined || !Number.isFinite(Number(v)) ? null : Math.round(Number(v) * f) / f;
+    }
+    function fmt1(v, key) {
+        return Number(v).toLocaleString('de-DE', {
+            maximumFractionDigits: key === 'salt' ? 2 : 1
+        })
+    }
     function offNutrient(n, base, unit) {
         const v = unit === 'ml' ? normalizeNumber(n[base + '_100ml']) : null;
-        return v !== null ? v : normalizeNumber(n[base + '_100g']);
+        return round1(v !== null ? v : normalizeNumber(n[base + '_100g']), base);
     }
     function offNutriments(p) {
         const n = p.nutriments || {};
@@ -1750,13 +1761,13 @@
                 return ['grey', '–', 'keine Angabe', ''];
             const [low, high] = ampelLimits[unit][key];
             const amount = hasPack ? v * p.pack / 100 : v;
-            const shown = fmt(amount) + ' g';
+            const shown = fmt1(amount, key) + ' g';
             const pct = Math.round(amount / daily[key] * 100);
             const share = (pct < 1 && amount > 0 ? '< 1' : pct) + ' % vom Tageswert';
             return v <= low ? ['green', shown, 'unbedenklich', share] : v <= high ? ['yellow', shown, 'in Maßen', share] : ['red', shown, 'ungesund', share];
         };
         const r = cols.map(([k]) => rate(k, p[k]));
-        const note = (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + ' · Tageswert für Erwachsene: Salz 6 g, Zucker 90 g, Fett 70 g';
+        const note = (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + '<br>Tageswert für Erwachsene: Salz 6 g, Zucker 90 g, Fett 70 g';
         return `<table class="ampel" aria-label="Nährwert-Ampel"><tr>${cols.map(([, label]) => `<th>${label}</th>`).join('')}</tr><tr>${r.map(([c, v, , s]) => `<td class="amp amp-${c}">${v}${s ? `<span class="amppct">${s}</span>` : ''}</td>`).join('')}</tr><tr>${r.map(([c, , t]) => `<td class="amptext amptext-${c}">${t}</td>`).join('')}</tr></table><p class="ampnote">${note}</p>`;
     }
     // Produktdaten nach dem Scan einklappen, damit Ampel, Status, Allergie-Kasten und Bewertungen ohne Scrollen sichtbar sind.
@@ -1791,7 +1802,7 @@
             u = $('packUnit').value === 'ml' ? 'ml' : 'g';
         for (const [id, unit] of Object.entries(perPackFields)) {
             const v = val(id);
-            $('perpack-' + id).textContent = pack && v !== null ? '= ' + fmt(id === 'kcal' ? Math.round(v * pack / 100) : v * pack / 100) + ' ' + unit + ' in der ganzen Packung (' + fmt(pack) + ' ' + u + ')' : '';
+            $('perpack-' + id).textContent = pack && v !== null ? '= ' + fmt1(id === 'kcal' ? Math.round(v * pack / 100) : v * pack / 100, id) + ' ' + unit + ' in der ganzen Packung (' + fmt(pack) + ' ' + u + ')' : '';
         }
     }
     function openProductDetails() {
@@ -1971,7 +1982,7 @@
         $('pack').value = p.pack ?? '';
         $('packUnit').value = p.packUnit || 'g';
         for (const k of ['kcal', 'salt', 'fat', 'satfat', 'sugar', 'fiber', 'protein', 'veg'])
-            $(k).value = p[k] ?? '';
+            $(k).value = round1(p[k], k) ?? '';
         $('veg').dataset.source = p.vegSource || 'manual';
         $('veg').dataset.note = p.vegNote || '';
         $('allergens').value = p.allergens || '';
