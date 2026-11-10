@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.7.1 – Prototyp</title>
+    <title>FoodCheck 1.8.0 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -496,6 +496,14 @@
         color: #fff
     }
 
+    .amppct {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 2px;
+        opacity: .92
+    }
+
     .amp-green { background: #2e8b3e }
     .amp-yellow { background: #f2c200; color: #1f2925 }
     .amp-red { background: #d93025 }
@@ -831,7 +839,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">FoodCheck Version 1.7.1 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.8.0 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -1731,16 +1739,25 @@
         const cols = [['salt', 'Salz'], ['sugar', 'Zucker'], ['fat', 'Fett']];
         // Angezeigt wird die Menge in der ganzen Packung; die Farbe richtet sich nach dem Gehalt je 100 g/ml (so ist die Ampel definiert).
         const hasPack = p.pack !== null && p.pack > 0;
+        // Referenzmengen für einen Erwachsenen laut EU-Lebensmittelinformationsverordnung (wie auf Verpackungen).
+        const daily = {
+            salt: 6,
+            sugar: 90,
+            fat: 70
+        };
         const rate = (key, v) => {
             if (v === null || v === undefined || !Number.isFinite(v))
-                return ['grey', '–', 'keine Angabe'];
+                return ['grey', '–', 'keine Angabe', ''];
             const [low, high] = ampelLimits[unit][key];
-            const shown = fmt(hasPack ? v * p.pack / 100 : v) + ' g';
-            return v <= low ? ['green', shown, 'unbedenklich'] : v <= high ? ['yellow', shown, 'in Maßen'] : ['red', shown, 'ungesund'];
+            const amount = hasPack ? v * p.pack / 100 : v;
+            const shown = fmt(amount) + ' g';
+            const pct = Math.round(amount / daily[key] * 100);
+            const share = (pct < 1 && amount > 0 ? '< 1' : pct) + ' % vom Tageswert';
+            return v <= low ? ['green', shown, 'unbedenklich', share] : v <= high ? ['yellow', shown, 'in Maßen', share] : ['red', shown, 'ungesund', share];
         };
         const r = cols.map(([k]) => rate(k, p[k]));
-        const note = hasPack ? `Menge in der ganzen Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`;
-        return `<table class="ampel" aria-label="Nährwert-Ampel"><tr>${cols.map(([, label]) => `<th>${label}</th>`).join('')}</tr><tr>${r.map(([c, v]) => `<td class="amp amp-${c}">${v}</td>`).join('')}</tr><tr>${r.map(([c, , t]) => `<td class="amptext amptext-${c}">${t}</td>`).join('')}</tr></table><p class="ampnote">${note}</p>`;
+        const note = (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + ' · Tageswert für Erwachsene: Salz 6 g, Zucker 90 g, Fett 70 g';
+        return `<table class="ampel" aria-label="Nährwert-Ampel"><tr>${cols.map(([, label]) => `<th>${label}</th>`).join('')}</tr><tr>${r.map(([c, v, , s]) => `<td class="amp amp-${c}">${v}${s ? `<span class="amppct">${s}</span>` : ''}</td>`).join('')}</tr><tr>${r.map(([c, , t]) => `<td class="amptext amptext-${c}">${t}</td>`).join('')}</tr></table><p class="ampnote">${note}</p>`;
     }
     // Produktdaten nach dem Scan einklappen, damit Ampel, Status, Allergie-Kasten und Bewertungen ohne Scrollen sichtbar sind.
     function collapseProductDetails() {
