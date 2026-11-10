@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.8.2 – Prototyp</title>
+    <title>FoodCheck 1.8.4 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -521,10 +521,15 @@
     .amptext-grey { color: var(--muted) }
 
     .ampnote {
-        margin: 0;
+        margin: 4px 0 0;
         font-size: 12px;
+        line-height: 1.5;
         color: var(--muted);
-        text-align: right
+        text-align: center
+    }
+
+    .ampnote span {
+        display: block
     }
 
     .famlist {
@@ -839,7 +844,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">FoodCheck Version 1.8.2 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.8.4 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -1724,6 +1729,17 @@
             findAlternatives();
         if (e.target && e.target.dataset && e.target.dataset.goto)
             document.querySelector('[data-tab="' + e.target.dataset.goto + '"]').click();
+        // "Werte von der Packung eintragen": Produktdaten aufklappen und ins Salz-Feld springen.
+        if (e.target && e.target.dataset && e.target.dataset.action === 'enterNutrients') {
+            $('productDetails').open = true;
+            $('salt').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            $('salt').focus({
+                preventScroll: true
+            });
+        }
         if (e.target && e.target.id === 'jumpResult')
             $('result').scrollIntoView({
                 behavior: 'smooth'
@@ -1766,8 +1782,12 @@
             const share = (pct < 1 && amount > 0 ? '< 1' : pct) + ' % vom Tageswert';
             return v <= low ? ['green', shown, 'unbedenklich', share] : v <= high ? ['yellow', shown, 'in Maßen', share] : ['red', shown, 'ungesund', share];
         };
+        // Fehlen alle drei Werte (z. B. unvollständiger Datenbank-Eintrag), statt leerer Ampel einen klaren Hinweis zeigen.
+        const missing = v => v === null || v === undefined || !Number.isFinite(v);
+        if (cols.every(([k]) => missing(p[k])))
+            return `<div class="alertbig neutral"><strong class="alerthead">Keine Nährwerte vorhanden</strong>Für dieses Produkt fehlen ${p.meta ? 'in Open Food Facts noch' : ''} die Angaben zu Salz, Zucker und Fett. Deshalb gibt es keine Ampel und keine Punkte-Bewertung. Die Allergieprüfung oben nutzt die Zutatenliste und funktioniert trotzdem.<div class="actions"><button type="button" class="secondary" data-action="enterNutrients">Werte von der Packung eintragen</button>${p.barcode && p.meta ? `<a class="btnlink" href="${offProductLink(p.barcode, true)}" target="_blank" rel="noopener">Bei Open Food Facts ergänzen ↗</a>` : ''}</div></div>`;
         const r = cols.map(([k]) => rate(k, p[k]));
-        const note = (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + '<br>Tageswert für Erwachsene: Salz 6 g, Zucker 90 g, Fett 70 g';
+        const note = '<span>' + (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + '</span><span>Tageswert für Erwachsene: Salz 6 g, Zucker 90 g, Fett 70 g</span>';
         return `<table class="ampel" aria-label="Nährwert-Ampel"><tr>${cols.map(([, label]) => `<th>${label}</th>`).join('')}</tr><tr>${r.map(([c, v, , s]) => `<td class="amp amp-${c}">${v}${s ? `<span class="amppct">${s}</span>` : ''}</td>`).join('')}</tr><tr>${r.map(([c, , t]) => `<td class="amptext amptext-${c}">${t}</td>`).join('')}</tr></table><p class="ampnote">${note}</p>`;
     }
     // Produktdaten nach dem Scan einklappen, damit Ampel, Status, Allergie-Kasten und Bewertungen ohne Scrollen sichtbar sind.
