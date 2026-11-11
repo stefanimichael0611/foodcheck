@@ -1,4 +1,4 @@
-const CACHE = 'pickwell-v2-0-0';
+const CACHE = 'pickwell-v2-0-1';
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
