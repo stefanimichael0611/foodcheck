@@ -1,4 +1,4 @@
-const CACHE = 'foodcheck-v1-9-1';
+const CACHE = 'pickwell-v2-0-0';
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
@@ -9,7 +9,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith('foodcheck-') && key !== CACHE).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => (key.startsWith('foodcheck-') || key.startsWith('pickwell-')) && key !== CACHE).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -25,7 +25,7 @@ self.addEventListener('fetch', event => {
     } catch (error) {
       const cached = await caches.match(request);
       if (cached) return cached;
-      return new Response('FoodCheck ist momentan offline. Bitte Internetverbindung prüfen und erneut laden.', {status:503,statusText:'Offline',headers:{'Content-Type':'text/plain; charset=utf-8'}});
+      return new Response('Pickwell ist momentan offline. Bitte Internetverbindung prüfen und erneut laden.', {status:503,statusText:'Offline',headers:{'Content-Type':'text/plain; charset=utf-8'}});
     }
   })());
 });

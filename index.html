@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.9.1 – Prototyp</title>
+    <title>Pickwell 2.0.0 – Know better. Shop smarter.</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="FoodCheck">
+    <meta name="apple-mobile-web-app-title" content="Pickwell">
     <style>
     :root {
         --green: #176b52;
@@ -796,8 +796,8 @@
     <header>
         <div class="headrow">
             <div>
-                <h1>🥬 FoodCheck</h1>
-                <p>Lebensmittel verstehen. Besser vergleichen.</p>
+                <h1>🥬 Pickwell</h1>
+                <p>Know better. Shop smarter.</p>
             </div>
             <button type="button" class="sharebtn" id="shareApp" aria-label="App teilen">📤 App teilen</button>
         </div>
@@ -859,7 +859,7 @@
                 </div>
                 <details id="productDetails" class="full productdetails" open>
                     <summary id="productSummary">Produktdaten</summary>
-                    <p class="muted" style="margin:6px 0 0">Nährwerte wie auf der Verpackung je 100 g (Getränke je 100 ml) eintragen – FoodCheck rechnet sie automatisch auf die ganze Packung um. Unbekannte Werte leer lassen.</p>
+                    <p class="muted" style="margin:6px 0 0">Nährwerte wie auf der Verpackung je 100 g (Getränke je 100 ml) eintragen – Pickwell rechnet sie automatisch auf die ganze Packung um. Unbekannte Werte leer lassen.</p>
                     <div class="grid">
                 <div class="full">
                     <label for="name">Produktname</label>
@@ -970,10 +970,10 @@
             <input id="memberAge" type="number" min="1" max="17" inputmode="numeric" placeholder="z. B. 6" style="max-width:160px">
             <p class="muted" style="margin:6px 0 0">Bei Kindern rechnet die Ampel mit kindgerechten Tageswerten (z. B. 3 g Salz für 4- bis 6-Jährige statt 6 g).</p>
             <h2 style="margin-top:20px">Allergien</h2>
-            <p>Wähle Allergene aus, die FoodCheck markieren soll. Standardmäßig gelten auch Spurenhinweise („Kann … enthalten“) als Treffer. Wenn Spuren für dich unbedenklich sind, setze zusätzlich „Spuren ok“.</p>
+            <p>Wähle Allergene aus, die Pickwell markieren soll. Standardmäßig gelten auch Spurenhinweise („Kann … enthalten“) als Treffer. Wenn Spuren für dich unbedenklich sind, setze zusätzlich „Spuren ok“.</p>
             <div id="allergenOptions"></div>
             <h2 style="margin-top:20px">Ernährungsvorlieben</h2>
-            <p>FoodCheck warnt, wenn ein Produkt laut Zutatenanalyse nicht dazu passt.</p>
+            <p>Pickwell warnt, wenn ein Produkt laut Zutatenanalyse nicht dazu passt.</p>
             <div id="dietOptions">
                 <label class="prefrow"><input type="checkbox" value="vegan"> Vegan</label>
                 <label class="prefrow"><input type="checkbox" value="vegetarian"> Vegetarisch</label>
@@ -995,7 +995,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">FoodCheck Version 1.9.1 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">Pickwell Version 2.0.0 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -1183,7 +1183,7 @@
         return 'https://de.openfoodfacts.org/cgi/product.pl?type=' + (edit ? 'edit' : 'search_or_add&action=process') + '&code=' + encodeURIComponent(code);
     }
     function reportBoxHtml(code) {
-        return `<div class="alertbig neutral"><strong class="alerthead">Produkt nicht in der Datenbank</strong>Hilf mit und trage es bei Open Food Facts ein – dann kann FoodCheck es beim nächsten Scan bewerten (für alle Nutzer).<p><a class="btnlink" href="${offProductLink(code, false)}" target="_blank" rel="noopener">Bei Open Food Facts eintragen ↗</a></p><small>Dafür brauchst du ein kostenloses Open-Food-Facts-Konto. Am einfachsten geht es mit der Open-Food-Facts-App: Barcode scannen und Fotos von Vorderseite, Zutatenliste und Nährwerttabelle machen. Bis dahin kannst du die Werte unten von Hand eintragen.</small><div class="actions"><button type="button" class="secondary" data-action="ocrIngredients">📷 Zutatenliste fotografieren – Allergene prüfen</button></div></div>`;
+        return `<div class="alertbig neutral"><strong class="alerthead">Produkt nicht in der Datenbank</strong>Hilf mit und trage es bei Open Food Facts ein – dann kann Pickwell es beim nächsten Scan bewerten (für alle Nutzer).<p><a class="btnlink" href="${offProductLink(code, false)}" target="_blank" rel="noopener">Bei Open Food Facts eintragen ↗</a></p><small>Dafür brauchst du ein kostenloses Open-Food-Facts-Konto. Am einfachsten geht es mit der Open-Food-Facts-App: Barcode scannen und Fotos von Vorderseite, Zutatenliste und Nährwerttabelle machen. Bis dahin kannst du die Werte unten von Hand eintragen.</small><div class="actions"><button type="button" class="secondary" data-action="ocrIngredients">📷 Zutatenliste fotografieren – Allergene prüfen</button></div></div>`;
     }
     function metaHtml(p) {
         const m = p.meta;
@@ -1494,7 +1494,7 @@
         const fmt = (v) => Number(v).toLocaleString('de-DE', {
             maximumFractionDigits: 2
         });
-        return `<p class="muted">Alle Mengen beziehen sich auf die ganze Packung. Der Einzelwert wird mit seiner Gewichtung verrechnet. Der Gemüseanteil fließt nicht in diese Packungsbewertung ein; die übrigen Gewichte (80 %) werden deshalb auf 100 % hochgerechnet.</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:7px;border-bottom:1px solid var(--line)">Kriterium</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Menge</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Einzelwert</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Gewichtung</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Punktebeitrag</th></tr></thead><tbody>${rows.map(([label, key, unit, pts, w]) => `<tr><td style="padding:7px;border-bottom:1px solid var(--line)">${label}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(m.vals[key])} ${unit}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts)}/100</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${Math.round(w * 100)} %</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts * w)} P.</td></tr>`).join('')}</tbody></table></div><p><strong>Berechnung:</strong> ungekürzte gewichtete Beiträge addieren (${fmt(rows.reduce((sum, row) => sum + row[3] * row[4], 0))} Punkte); anschließend durch die Summe der berücksichtigten Gewichte (80 %) teilen. Ergebnis: ${fmt(m.total)} → gerundet ${Math.round(m.total)}/100.</p><p class="muted">Hinweis: Das ist die derzeitige vorläufige FoodCheck-Testformel Version 0.6, keine medizinisch oder wissenschaftlich validierte Ernährungsbewertung.</p>`;
+        return `<p class="muted">Alle Mengen beziehen sich auf die ganze Packung. Der Einzelwert wird mit seiner Gewichtung verrechnet. Der Gemüseanteil fließt nicht in diese Packungsbewertung ein; die übrigen Gewichte (80 %) werden deshalb auf 100 % hochgerechnet.</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:7px;border-bottom:1px solid var(--line)">Kriterium</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Menge</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Einzelwert</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Gewichtung</th><th style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">Punktebeitrag</th></tr></thead><tbody>${rows.map(([label, key, unit, pts, w]) => `<tr><td style="padding:7px;border-bottom:1px solid var(--line)">${label}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(m.vals[key])} ${unit}</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts)}/100</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${Math.round(w * 100)} %</td><td style="text-align:right;padding:7px;border-bottom:1px solid var(--line)">${fmt(pts * w)} P.</td></tr>`).join('')}</tbody></table></div><p><strong>Berechnung:</strong> ungekürzte gewichtete Beiträge addieren (${fmt(rows.reduce((sum, row) => sum + row[3] * row[4], 0))} Punkte); anschließend durch die Summe der berücksichtigten Gewichte (80 %) teilen. Ergebnis: ${fmt(m.total)} → gerundet ${Math.round(m.total)}/100.</p><p class="muted">Hinweis: Das ist die derzeitige vorläufige Pickwell-Testformel Version 0.6, keine medizinisch oder wissenschaftlich validierte Ernährungsbewertung.</p>`;
     }
     // Allergie-Ergebnis als gut sichtbarer Kasten ganz oben – direkt nach dem Scan.
     function allergyBannerHtml(a, who) {
@@ -2540,7 +2540,7 @@
         a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], {
             type: 'text/csv;charset=utf-8'
         }));
-        a.download = 'foodcheck-vergleich.csv';
+        a.download = 'pickwell-vergleich.csv';
         a.click();
         URL.revokeObjectURL(a.href)
     }
@@ -3040,13 +3040,13 @@
     function appLink() {
         return location.origin + location.pathname.replace(/index\.html$/, '');
     }
-    const shareText = 'Probier mal FoodCheck: Barcode von Lebensmitteln scannen und Nutri-Score, Zusatzstoffe, Allergene und bessere Alternativen sehen. Tipp: Auf dem iPhone in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Noch ein Prototyp – bei Allergien bitte immer die Verpackung prüfen.';
+    const shareText = 'Probier mal Pickwell – Know better. Shop smarter. 🥬 Einfach den Barcode von Lebensmitteln scannen und sofort sehen: passt es zu Allergien und Vorlieben der Familie, Nutri-Score, Zucker, Salz, Fett und bessere Alternativen. Tipp: Auf dem iPhone in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Noch ein Prototyp – bei Allergien bitte immer die Verpackung prüfen.';
     $('shareApp').addEventListener('click', async () => {
         const url = appLink();
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: 'FoodCheck',
+                    title: 'Pickwell',
                     text: shareText,
                     url
                 });
