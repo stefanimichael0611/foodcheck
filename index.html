@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.8.5 – Prototyp</title>
+    <title>FoodCheck 1.9.1 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -436,6 +436,120 @@
         margin-top: 8px
     }
 
+    .cubes {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        margin: 8px 0 0;
+        font-size: 14px
+    }
+
+    .cubeicons {
+        letter-spacing: -2px;
+        font-size: 15px
+    }
+
+    .kidshare {
+        background: #f5f7f5;
+        border-radius: 10px;
+        padding: 8px 12px;
+        margin-top: 8px;
+        font-size: 14px
+    }
+
+    .kidshare ul {
+        margin: 4px 0 0;
+        padding-left: 18px
+    }
+
+    .kidshare .over {
+        color: #b42318
+    }
+
+    .altline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--mint);
+        border-radius: 10px;
+        padding: 8px 10px;
+        margin: 8px 0 0;
+        font-size: 15px
+    }
+
+    p.altline.muted {
+        background: #f5f7f5;
+        font-size: 14px
+    }
+
+    .tabcount {
+        display: inline-block;
+        min-width: 20px;
+        padding: 0 6px;
+        border-radius: 999px;
+        background: #b42318;
+        color: #fff;
+        font-size: 12px;
+        margin-left: 4px
+    }
+
+    .tabcount.hidden {
+        display: none
+    }
+
+    .shoplist {
+        list-style: none;
+        padding: 0;
+        margin: 8px 0 0
+    }
+
+    .shoplist li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-top: 1px solid var(--line);
+        padding: 8px 0
+    }
+
+    .shoplist li input {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0
+    }
+
+    .shoplist .histitem {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        padding: 4px 0;
+        text-align: left;
+        flex: 1;
+        min-width: 0
+    }
+
+    .shoplist .histitem > span {
+        min-width: 0
+    }
+
+    .shoplist .histname {
+        display: block;
+        font-weight: 650;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    .shoplist li.done .histname {
+        text-decoration: line-through;
+        color: var(--muted)
+    }
+
+    .shopempty {
+        color: var(--muted)
+    }
+
     .perpack {
         display: block;
         margin-top: 4px;
@@ -502,6 +616,23 @@
         font-weight: 600;
         margin-top: 2px;
         opacity: .92
+    }
+
+    @media (max-width: 520px) {
+        .ampel { border-spacing: 4px 4px; margin-left: -4px; margin-right: -4px }
+        .ampel th { font-size: 13px }
+        .amp { font-size: 14px; padding: 7px 2px !important }
+        .amptext { font-size: 11.5px; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; line-height: 1.25 }
+    }
+
+    .amp-kcal { background: #3d6f8f }
+    .amptext-kcal { color: #3d6f8f }
+
+    .amppct small {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 500;
+        color: inherit
     }
 
     .amp-green { background: #2e8b3e }
@@ -686,6 +817,7 @@
         </div>
         <div class="tabs" role="tablist">
             <button class="active" data-tab="check">Produkt prüfen</button>
+            <button data-tab="shop">Einkaufsliste <span id="shopCount" class="tabcount hidden"></span></button>
             <button data-tab="compare">Vergleichen</button>
             <button data-tab="profile">Mein Profil</button>
         </div>
@@ -707,6 +839,7 @@
                         <button type="button" class="secondary" id="startScan">🎥 Live-Scan</button>
                         <button type="button" class="secondary hidden" id="stopScan">Scan beenden</button>
                         <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
+                        <input type="file" id="ocrInput" accept="image/*" capture="environment" class="hidden">
                     </div>
                     <video id="scannerVideo" class="hidden" playsinline style="width:100%;max-height:300px;border-radius:12px;background:#111;margin-top:8px"></video>
                     <p id="scanStatus" class="muted">Datenquelle: Open Food Facts. Wenn die Kamera nicht unterstützt wird, Barcode manuell eingeben.</p>
@@ -715,6 +848,8 @@
                         <div id="quickAllergy"></div>
                         <div id="ampel"></div>
                         <div id="quickBadges"></div>
+                        <div id="quickAlt"></div>
+                        <div id="quickActions"></div>
                         <details id="moreDetails" class="moredetails">
                             <summary>Alle Details anzeigen</summary>
                             <div id="detailTop"></div>
@@ -772,6 +907,10 @@
                 <details class="full subdetails" id="ingredientsDetails">
                     <summary>Zutaten / Allergene / Spurenhinweise (Text von Packung)</summary>
                     <textarea id="allergens" rows="5" aria-label="Zutaten, Allergene und Spurenhinweise" placeholder="Zutaten und hervorgehobene Allergene eintragen"></textarea>
+                    <div class="actions" style="margin-top:8px">
+                        <button type="button" class="secondary" data-action="ocrIngredients">📷 Zutatenliste fotografieren</button>
+                    </div>
+                    <p id="ocrStatus" class="muted" style="margin:6px 0 0"></p>
                 </details>
                 <div class="full">
                     <label for="dataQuality">Datenqualität</label>
@@ -797,6 +936,15 @@
                 <button class="secondary" id="clear">Leeren</button>
             </div>
         </section>
+        <section id="shop" class="tab panel hidden">
+            <h2>Einkaufsliste</h2>
+            <p class="muted">Produkte nach dem Scan mit „⭐ Auf die Einkaufsliste“ merken. Im Laden abhaken; Antippen des Namens zeigt die Bewertung (auch ohne Internet).</p>
+            <ul id="shopList" class="shoplist"></ul>
+            <div class="actions">
+                <button type="button" class="secondary" id="shopClearDone">Abgehakte entfernen</button>
+                <button type="button" class="secondary" id="shopClearAll">Liste leeren</button>
+            </div>
+        </section>
         <section id="compare" class="tab panel hidden">
             <h2>Produktvergleich</h2>
             <p class="muted">Gespeicherte Produkte werden auf Basis der verfügbaren Angaben verglichen.</p>
@@ -818,6 +966,9 @@
                 <button type="button" class="secondary" id="renameMember">Umbenennen</button>
                 <button type="button" class="secondary" id="deleteMember">Löschen</button>
             </div>
+            <label for="memberAge">Alter in Jahren <small>(nur bei Kindern nötig – leer lassen = erwachsen)</small></label>
+            <input id="memberAge" type="number" min="1" max="17" inputmode="numeric" placeholder="z. B. 6" style="max-width:160px">
+            <p class="muted" style="margin:6px 0 0">Bei Kindern rechnet die Ampel mit kindgerechten Tageswerten (z. B. 3 g Salz für 4- bis 6-Jährige statt 6 g).</p>
             <h2 style="margin-top:20px">Allergien</h2>
             <p>Wähle Allergene aus, die FoodCheck markieren soll. Standardmäßig gelten auch Spurenhinweise („Kann … enthalten“) als Treffer. Wenn Spuren für dich unbedenklich sind, setze zusätzlich „Spuren ok“.</p>
             <div id="allergenOptions"></div>
@@ -844,7 +995,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">FoodCheck Version 1.8.5 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.9.1 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -966,6 +1117,13 @@
         }
     }
     // Wird der Barcode von Hand geändert, gehören die gespeicherten Zusatzdaten nicht mehr zum Produkt.
+    // "Produkt suchen" wird grün (Hauptaktion), sobald ein gültiger Barcode im Feld steht – sonst grau.
+    function updateLookupButton() {
+        const ok = /^\d{8,14}$/.test($('barcode').value.trim().replace(/\s/g, ''));
+        $('lookupBarcode').classList.toggle('primary', ok);
+        $('lookupBarcode').classList.toggle('secondary', !ok);
+    }
+    $('barcode').addEventListener('input', updateLookupButton);
     $('barcode').addEventListener('input', () => {
         delete $('barcode').dataset.categories;
         delete $('barcode').dataset.meta
@@ -1025,7 +1183,7 @@
         return 'https://de.openfoodfacts.org/cgi/product.pl?type=' + (edit ? 'edit' : 'search_or_add&action=process') + '&code=' + encodeURIComponent(code);
     }
     function reportBoxHtml(code) {
-        return `<div class="alertbig neutral"><strong class="alerthead">Produkt nicht in der Datenbank</strong>Hilf mit und trage es bei Open Food Facts ein – dann kann FoodCheck es beim nächsten Scan bewerten (für alle Nutzer).<p><a class="btnlink" href="${offProductLink(code, false)}" target="_blank" rel="noopener">Bei Open Food Facts eintragen ↗</a></p><small>Dafür brauchst du ein kostenloses Open-Food-Facts-Konto. Am einfachsten geht es mit der Open-Food-Facts-App: Barcode scannen und Fotos von Vorderseite, Zutatenliste und Nährwerttabelle machen. Bis dahin kannst du die Werte unten von Hand eintragen.</small></div>`;
+        return `<div class="alertbig neutral"><strong class="alerthead">Produkt nicht in der Datenbank</strong>Hilf mit und trage es bei Open Food Facts ein – dann kann FoodCheck es beim nächsten Scan bewerten (für alle Nutzer).<p><a class="btnlink" href="${offProductLink(code, false)}" target="_blank" rel="noopener">Bei Open Food Facts eintragen ↗</a></p><small>Dafür brauchst du ein kostenloses Open-Food-Facts-Konto. Am einfachsten geht es mit der Open-Food-Facts-App: Barcode scannen und Fotos von Vorderseite, Zutatenliste und Nährwerttabelle machen. Bis dahin kannst du die Werte unten von Hand eintragen.</small><div class="actions"><button type="button" class="secondary" data-action="ocrIngredients">📷 Zutatenliste fotografieren – Allergene prüfen</button></div></div>`;
     }
     function metaHtml(p) {
         const m = p.meta;
@@ -1189,22 +1347,24 @@
             }
         }
     }
+    // Suchbegriffe je Allergen. Treffer gelten für das Wort und Zusammensetzungen, die damit beginnen (z. B. "Weizenmehl").
+    // Deshalb auch Mehrzahl-/Umlautformen ("Erdnüsse", "Haselnüsse") und englische Begriffe (Zutatenlisten in Open Food Facts sind teils englisch).
     function allergyTerms() {
         return {
-            'gluten/weizen': ['en:wheat', 'en:gluten', 'weizen', 'roggen', 'gerste', 'gluten'],
-            'milch': ['en:milk', 'milch', 'laktose', 'molke', 'käse', 'mozzarella'],
-            'ei': ['en:eggs', 'en:egg', 'eier', 'ei'],
-            'soja': ['en:soybeans', 'sojabohne', 'soja'],
-            'erdnüsse': ['en:peanuts', 'erdnuss'],
-            'schalenfrüchte': ['en:nuts', 'mandel', 'haselnuss', 'walnuss', 'cashew', 'pistazie', 'pecannuss', 'macadamia'],
-            'sellerie': ['en:celery', 'sellerie'],
-            'senf': ['en:mustard', 'senf'],
-            'sesam': ['en:sesame-seeds', 'sesam'],
-            'fisch': ['en:fish', 'fisch'],
-            'krebstiere': ['en:crustaceans', 'krebstier'],
-            'weichtiere': ['en:molluscs', 'weichtier'],
-            'lupine': ['en:lupin', 'lupine'],
-            'schwefeldioxid/sulfite': ['en:sulphur-dioxide-and-sulphites', 'sulfit', 'schwefeldioxid']
+            'gluten/weizen': ['en:wheat', 'en:gluten', 'weizen', 'roggen', 'gerste', 'hafer', 'dinkel', 'emmer', 'kamut', 'grünkern', 'gluten', 'wheat', 'barley', 'rye', 'oats', 'spelt'],
+            'milch': ['en:milk', 'milch', 'laktose', 'lactose', 'molke', 'käse', 'mozzarella', 'butter', 'sahne', 'rahm', 'joghurt', 'quark', 'milk', 'cheese', 'cream', 'whey'],
+            'ei': ['en:eggs', 'en:egg', 'eier', 'ei', 'vollei', 'eigelb', 'egg'],
+            'soja': ['en:soybeans', 'sojabohne', 'soja', 'soy'],
+            'erdnüsse': ['en:peanuts', 'erdnuss', 'erdnüsse', 'peanut'],
+            'schalenfrüchte': ['en:nuts', 'mandel', 'haselnuss', 'haselnüsse', 'walnuss', 'walnüsse', 'cashew', 'pistazie', 'pecannuss', 'pecannüsse', 'paranuss', 'paranüsse', 'macadamia', 'schalenfrüchte', 'almond', 'hazelnut', 'walnut', 'pistachio', 'pecan'],
+            'sellerie': ['en:celery', 'sellerie', 'celery'],
+            'senf': ['en:mustard', 'senf', 'mustard'],
+            'sesam': ['en:sesame-seeds', 'sesam', 'sesame'],
+            'fisch': ['en:fish', 'fisch', 'fish', 'thunfisch', 'lachs', 'sardelle'],
+            'krebstiere': ['en:crustaceans', 'krebstier', 'krebs', 'garnele', 'shrimp', 'krabbe', 'hummer', 'languste', 'crustacean'],
+            'weichtiere': ['en:molluscs', 'weichtier', 'muschel', 'tintenfisch', 'kalmar', 'auster', 'schnecke', 'mollusc'],
+            'lupine': ['en:lupin', 'lupine', 'lupin'],
+            'schwefeldioxid/sulfite': ['en:sulphur-dioxide-and-sulphites', 'sulfit', 'schwefeldioxid', 'sulphite', 'sulfite', 'e220', 'e221', 'e222', 'e223', 'e224', 'e226', 'e227', 'e228']
         };
     }
     function containsAllergen(text, term) {
@@ -1214,7 +1374,12 @@
             return t.includes(x);
         if (x === 'ei')
             return /(^|[^a-zäöüß])(ei|eier|eipulver|eiweiß|eiklar)([^a-zäöüß]|$)/i.test(t);
-        // Match whole words and ingredient compounds (e.g. Weizenmehl), but not arbitrary substrings (e.g. Ei in Weizen).
+        // Längere Begriffe auch mitten im Wort finden (z. B. "Vollmilchpulver", "Süßmolke", "Hartweizengrieß").
+        // Lieber einmal zu viel warnen (z. B. "Kokosmilch") als ein Allergen übersehen.
+        // Ausnahmen, die sonst häufig falsch anschlagen würden: "Kakaobutter"/"Sheabutter", "Lachsschinken".
+        if (x.length >= 5 && !['butter', 'lachs'].includes(x))
+            return t.includes(x);
+        // Kurze Begriffe: ganze Wörter und Zusammensetzungen, die damit beginnen (z. B. Sojalecithin), nicht beliebige Teilstücke.
         const escaped = x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return new RegExp('(^|[^a-zäöüß])' + escaped + '[a-zäöüß-]*', 'i').test(t);
     }
@@ -1740,6 +1905,18 @@
                 preventScroll: true
             });
         }
+        // "mehr" bei der Alternative: Details öffnen und die ausführliche Alternativensuche starten.
+        if (e.target && e.target.dataset && e.target.dataset.action === 'moreAlternatives') {
+            $('moreDetails').open = true;
+            const b = $('findAlternatives');
+            if (b) {
+                b.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                b.click();
+            }
+        }
         if (e.target && e.target.id === 'jumpResult')
             $('result').scrollIntoView({
                 behavior: 'smooth'
@@ -1761,34 +1938,83 @@
             fat: [1.5, 8.75]
         }
     };
+    // Tageswerte: Erwachsene nach EU-Lebensmittelinformationsverordnung (Salz 6 g, Zucker 90 g, Fett 70 g; Basis 2000 kcal).
+    // Kinder: Salz-Höchstmengen nach britischer Empfehlung (NHS/SACN: 1–3 J. 2 g, 4–6 J. 3 g, 7–10 J. 5 g, ab 11 J. 6 g);
+    // Zucker und Fett anteilig zum ungefähren Energiebedarf des Alters (1–3 J. ~55 %, 4–6 J. ~70 %, 7–9 J. ~90 % von 2000 kcal).
+    function dailyFor(age) {
+        if (!age || age >= 15)
+            return {
+                salt: 6,
+                sugar: 90,
+                fat: 70,
+                kcal: 2000
+            };
+        const salt = age < 4 ? 2 : age < 7 ? 3 : age < 11 ? 5 : 6;
+        const e = age < 4 ? 0.55 : age < 7 ? 0.7 : age < 10 ? 0.9 : 1;
+        return {
+            salt,
+            sugar: Math.round(90 * e),
+            fat: Math.round(70 * e),
+            kcal: Math.round(2000 * e / 50) * 50
+        };
+    }
+    const memberLabel = m => escapeHtml(m.name) + (m.age ? ' (' + m.age + ' J.)' : '');
+    // Würfelzucker: 1 Stück ≈ 3 g.
+    function sugarCubesHtml(grams) {
+        if (grams === null || !Number.isFinite(grams) || grams < 1.5)
+            return '';
+        const n = Math.round(grams / 3);
+        const icons = '🧊'.repeat(Math.min(n, 20)) + (n > 20 ? ' +' + (n - 20) : '');
+        return `<p class="cubes"><span class="cubeicons" aria-hidden="true">${icons}</span><span>≈ <strong>${n} Stück Würfelzucker</strong> ${grams === null ? '' : '(' + fmt1(grams) + ' g Zucker)'}</span></p>`;
+    }
     function ampelHtml(p) {
         const unit = p.packUnit === 'ml' ? 'ml' : 'g';
         const cols = [['salt', 'Salz'], ['sugar', 'Zucker'], ['fat', 'Fett']];
         // Angezeigt wird die Menge in der ganzen Packung; die Farbe richtet sich nach dem Gehalt je 100 g/ml (so ist die Ampel definiert).
         const hasPack = p.pack !== null && p.pack > 0;
-        // Referenzmengen für einen Erwachsenen laut EU-Lebensmittelinformationsverordnung (wie auf Verpackungen).
-        const daily = {
-            salt: 6,
-            sugar: 90,
-            fat: 70
-        };
-        const rate = (key, v) => {
-            if (v === null || v === undefined || !Number.isFinite(v))
-                return ['grey', '–', 'keine Angabe', ''];
-            const [low, high] = ampelLimits[unit][key];
-            const amount = hasPack ? v * p.pack / 100 : v;
-            const shown = fmt1(amount, key) + ' g';
-            const pct = Math.round(amount / daily[key] * 100);
-            const share = (pct < 1 && amount > 0 ? '< 1' : pct) + ' % vom Tageswert';
-            return v <= low ? ['green', shown, 'unbedenklich', share] : v <= high ? ['yellow', shown, 'in Maßen', share] : ['red', shown, 'ungesund', share];
-        };
-        // Fehlen alle drei Werte (z. B. unvollständiger Datenbank-Eintrag), statt leerer Ampel einen klaren Hinweis zeigen.
         const missing = v => v === null || v === undefined || !Number.isFinite(v);
+        // Fehlen alle drei Werte (z. B. unvollständiger Datenbank-Eintrag), statt leerer Ampel einen klaren Hinweis zeigen.
         if (cols.every(([k]) => missing(p[k])))
             return `<div class="alertbig neutral"><strong class="alerthead">Keine Nährwerte vorhanden</strong>Für dieses Produkt fehlen ${p.meta ? 'in Open Food Facts noch' : ''} die Angaben zu Salz, Zucker und Fett. Deshalb gibt es keine Ampel und keine Punkte-Bewertung. Die Allergieprüfung oben nutzt die Zutatenliste und funktioniert trotzdem.<div class="actions"><button type="button" class="secondary" data-action="enterNutrients">Werte von der Packung eintragen</button>${p.barcode && p.meta ? `<a class="btnlink" href="${offProductLink(p.barcode, true)}" target="_blank" rel="noopener">Bei Open Food Facts ergänzen ↗</a>` : ''}</div></div>`;
-        const r = cols.map(([k]) => rate(k, p[k]));
-        const note = '<span>' + (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + '</span><span>Tageswert für Erwachsene: Salz 6 g, Zucker 90 g, Fett 70 g</span>';
-        return `<table class="ampel" aria-label="Nährwert-Ampel"><tr>${cols.map(([, label]) => `<th>${label}</th>`).join('')}</tr><tr>${r.map(([c, v, , s]) => `<td class="amp amp-${c}">${v}${s ? `<span class="amppct">${s}</span>` : ''}</td>`).join('')}</tr><tr>${r.map(([c, , t]) => `<td class="amptext amptext-${c}">${t}</td>`).join('')}</tr></table><p class="ampnote">${note}</p>`;
+        const amount = k => missing(p[k]) ? null : hasPack ? p[k] * p.pack / 100 : p[k];
+        // Für wen gelten die Tageswerte? Eine einzelne ausgewählte Person mit Alter → kindgerechte Werte.
+        const members = selectedMembers();
+        const single = members.length === 1 ? members[0] : null;
+        const daily = dailyFor(single && single.age);
+        const pctText = (k, d) => {
+            const a = amount(k);
+            if (a === null)
+                return '';
+            const pct = Math.round(a / d[k] * 100);
+            return (pct < 1 && a > 0 ? '< 1' : pct) + ' %';
+        };
+        const r = cols.map(([k]) => {
+            const v = p[k];
+            if (missing(v))
+                return ['grey', '–', 'keine Angabe', ''];
+            const [low, high] = ampelLimits[unit][k];
+            const share = pctText(k, daily);
+            const shown = fmt1(amount(k), k) + ' g';
+            return v <= low ? ['green', shown, 'unbedenklich', share] : v <= high ? ['yellow', shown, 'in Maßen', share] : ['red', shown, 'ungesund', share];
+        });
+        // 4. Spalte: Kalorien der ganzen Packung (neutral gefärbt, da die Lebensmittelampel für Energie keine Farben vorsieht).
+        r.push(missing(p.kcal) ? ['grey', '–', 'keine Angabe', ''] : ['kcal', Math.round(amount('kcal')).toLocaleString('de-DE') + ' kcal', 'Energie', pctText('kcal', daily)]);
+        const headers = [...cols.map(([, label]) => label), 'Kalorien'];
+        const who = single && single.age && single.age < 15 ? 'Tageswert für ' + memberLabel(single) : 'Tageswert für Erwachsene';
+        let note = '<span>' + (hasPack ? `Menge und Tageswert-Anteil für die ganze Packung (${fmt(p.pack)} ${unit}) · Farbe nach Gehalt je 100 ${unit}` : `je 100 ${unit} (Packungsmenge unbekannt)`) + `</span><span>${who}: Salz ${daily.salt} g, Zucker ${daily.sugar} g, Fett ${daily.fat} g, Energie ${daily.kcal.toLocaleString('de-DE')} kcal</span>`;
+        // Bei "Ganze Familie": zusätzlich eine Zeile je Kind mit dessen Tageswert-Anteilen.
+        const kids = members.length > 1 ? members.filter(m => m.age && m.age < 15) : [];
+        const kidRows = kids.map(m => {
+            const d = dailyFor(m.age);
+            const parts = [...cols, ['kcal', 'Kalorien']].filter(([k]) => !missing(p[k])).map(([k, label]) => {
+                const t = pctText(k, d);
+                const over = amount(k) / d[k] >= 1;
+                return `${label} <strong${over ? ' class="over"' : ''}>${t}</strong>`;
+            });
+            return `<li><strong>${memberLabel(m)}:</strong> ${parts.join(' · ')}</li>`;
+        }).join('');
+        const kidBox = kidRows ? `<div class="kidshare"><strong>Anteil am Tageswert für Kinder</strong><ul>${kidRows}</ul></div>` : '';
+        return `<table class="ampel" aria-label="Nährwert-Ampel"><tr>${headers.map(label => `<th>${label}</th>`).join('')}</tr><tr>${r.map(([c, v, , s]) => `<td class="amp amp-${c}">${v}${s ? `<span class="amppct">${s}<small>vom Tageswert</small></span>` : ''}</td>`).join('')}</tr><tr>${r.map(([c, , t]) => `<td class="amptext amptext-${c}">${t}</td>`).join('')}</tr></table><p class="ampnote">${note}</p>${kidBox}${sugarCubesHtml(amount('sugar'))}`;
     }
     // Produktdaten nach dem Scan einklappen, damit Ampel, Status, Allergie-Kasten und Bewertungen ohne Scrollen sichtbar sind.
     function collapseProductDetails() {
@@ -1892,7 +2118,8 @@
             head = 'Kein Allergen erkannt · Vorlieben unklar';
         } else {
             cls = 'good';
-            head = '✓ Kein Allergen ' + (members.length > 1 ? 'aus euren Profilen' : 'aus deinem Profil') + ' erkannt';
+            const one = members[0];
+            head = '✓ Kein Allergen ' + (members.length > 1 ? 'aus euren Profilen' : named && one.name.trim().toLowerCase() !== 'ich' ? 'aus dem Profil von ' + escapeHtml(one.name) : 'aus deinem Profil') + ' erkannt';
         }
         const lines = [];
         for (const r of rows) {
@@ -1938,21 +2165,217 @@
             chips.push(`<span class="chip"><span class="ns eco-${m.eco} on mini">${m.eco === 'a-plus' ? 'A+' : m.eco.toUpperCase()}</span> Green-Score</span>`);
         return chips.length ? `<div class="chips">${chips.join('')}</div>` : '';
     }
-    // Reihenfolge: Schnellübersicht (Urteil, Ampel, Chips, Details eingeklappt) → Status → Produktdaten.
+    // ---------- Einkaufsliste / Favoriten ----------
+    // Gespeichert wird der komplette Produktstand, damit die Bewertung auch offline wieder angezeigt werden kann.
+    let shopList = [];
+    try {
+        shopList = JSON.parse(localStorage.getItem('fc_shop') || '[]')
+    } catch (e) {}
+    function saveShop() {
+        try {
+            localStorage.setItem('fc_shop', JSON.stringify(shopList))
+        } catch (e) {}
+        const open = shopList.filter(x => !x.done).length;
+        $('shopCount').textContent = open;
+        $('shopCount').classList.toggle('hidden', !open);
+    }
+    const shopKey = p => p.barcode || ('name:' + p.name);
+    function shopButtonHtml(p) {
+        const on = shopList.some(x => shopKey(x) === shopKey(p));
+        return `<div class="actions" style="margin-top:6px"><button type="button" class="${on ? 'primary' : 'secondary'}" data-action="toggleShop">${on ? '✓ Auf der Einkaufsliste' : '⭐ Auf die Einkaufsliste'}</button></div>`;
+    }
+    function toggleShop() {
+        const p = getProduct();
+        const k = shopKey(p);
+        if (shopList.some(x => shopKey(x) === k))
+            shopList = shopList.filter(x => shopKey(x) !== k);
+        else
+            shopList.unshift({
+                ...p,
+                vegNote: $('veg').dataset.note || '',
+                done: false,
+                ts: Date.now()
+            });
+        saveShop();
+        $('quickActions').innerHTML = shopButtonHtml(p);
+    }
+    function renderShop() {
+        if (!shopList.length) {
+            $('shopList').innerHTML = '<li class="shopempty">Noch nichts auf der Liste. Scanne ein Produkt und tippe auf „⭐ Auf die Einkaufsliste“.</li>';
+            return
+        }
+        $('shopList').innerHTML = shopList.map((x, i) => {
+            // Warnung, wenn das Produkt für eine ausgewählte Person nicht passt (aktuelle Profile).
+            const warn = selectedMembers().some(m => withMember(m, () => {
+                const a = allergyStatus(x);
+                return a.level === 'hit' || a.level === 'incomplete' || ((dietStatus(x) || {}).level === 'bad');
+            }));
+            const ns = x.meta && x.meta.nutriscore ? `<span class="ns ns${x.meta.nutriscore} on mini">${x.meta.nutriscore}</span>` : '';
+            const pack = x.pack ? ' · ' + fmt(x.pack) + ' ' + (x.packUnit === 'ml' ? 'ml' : 'g') : '';
+            return `<li class="${x.done ? 'done' : ''}"><input type="checkbox" data-shopdone="${i}" ${x.done ? 'checked' : ''} aria-label="${escapeHtml(x.name)} abhaken"><button type="button" class="histitem" data-shopopen="${i}">${ns}<span><span class="histname">${warn ? '⚠️ ' : ''}${escapeHtml(x.name)}</span><span class="altmeta">${escapeHtml(x.barcode || '')}${pack}</span></span></button><button type="button" class="secondary" data-shopdel="${i}" aria-label="Entfernen">✕</button></li>`;
+        }).join('');
+    }
+    $('shopList').addEventListener('change', e => {
+        const i = e.target.dataset.shopdone;
+        if (i === undefined)
+            return;
+        shopList[Number(i)].done = e.target.checked;
+        saveShop();
+        renderShop();
+    });
+    $('shopList').addEventListener('click', e => {
+        const del = e.target.closest('[data-shopdel]'),
+            open = e.target.closest('[data-shopopen]');
+        if (del) {
+            shopList.splice(Number(del.dataset.shopdel), 1);
+            saveShop();
+            renderShop();
+        } else if (open) {
+            const x = shopList[Number(open.dataset.shopopen)];
+            fillForm(x);
+            document.querySelector('[data-tab="check"]').click();
+            setStatus('Aus der Einkaufsliste geladen: ' + x.name + ' (gespeicherte Daten). Für aktuelle Daten „Produkt suchen“ tippen.');
+            showResult(getProduct());
+            collapseProductDetails();
+            loadQuickAlternative(getProduct());
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    });
+    $('shopClearDone').addEventListener('click', () => {
+        shopList = shopList.filter(x => !x.done);
+        saveShop();
+        renderShop();
+    });
+    $('shopClearAll').addEventListener('click', () => {
+        if (shopList.length && confirm('Ganze Einkaufsliste löschen?')) {
+            shopList = [];
+            saveShop();
+            renderShop();
+        }
+    });
+    document.addEventListener('click', e => {
+        if (e.target && e.target.dataset && e.target.dataset.action === 'toggleShop')
+            toggleShop();
+        if (e.target && e.target.dataset && e.target.dataset.action === 'retryAlt') {
+            const p = getProduct();
+            delete altCache[p.barcode];
+            $('quickAlt').innerHTML = quickAltHtml(p);
+            loadQuickAlternative(p);
+        }
+    });
+    document.querySelectorAll('[data-tab="shop"]').forEach(b => b.addEventListener('click', renderShop));
+    saveShop();
+
+    // ---------- Bessere Alternative (Schnellübersicht) ----------
+    // Nach dem Scan wird im Hintergrund die passendste Produktkategorie durchsucht (max. 2 Anfragen, pro Barcode zwischengespeichert).
+    // Vorgeschlagen wird nur ein Produkt mit besserem Nutri-Score, das zu Allergien und Vorlieben aller ausgewählten Personen passt.
+    const altCache = {};
+    const nsRank = g => 'ABCDE'.indexOf(String(g || '').toUpperCase());
+    async function fetchAltCandidates(p) {
+        const cats = (p.categories || []).filter(c => c.startsWith('en:')).reverse().slice(0, 2);
+        const fields = 'code,product_name,product_name_de,brands,quantity,product_quantity,product_quantity_unit,nutriments,ingredients_text,ingredients_text_de,allergens,allergens_tags,traces,traces_tags,nutriscore_grade,ingredients_analysis_tags';
+        let all = [];
+        for (const cat of cats) {
+            const r = await fetch('https://world.openfoodfacts.org/api/v2/search?' + new URLSearchParams({
+                categories_tags: cat,
+                countries_tags: 'en:germany',
+                page_size: '50',
+                fields
+            }).toString(), {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (!r.ok)
+                throw new Error('HTTP ' + r.status);
+            const d = await r.json();
+            all = all.concat((d.products || []).filter(x => /^[a-e]$/.test(String(x.nutriscore_grade || ''))));
+            if (all.length >= 10)
+                break;
+        }
+        return all;
+    }
+    function pickBetterAlternative(p, raw) {
+        const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9äöüß]+/g, ' ').trim();
+        const cur = p.name === 'Unbenanntes Produkt' ? '' : norm(p.name);
+        const curNs = p.meta && p.meta.nutriscore;
+        const members = selectedMembers();
+        const needsIngredients = members.some(m => (m.allergens || []).length || Object.values(m.diet || {}).some(Boolean));
+        const seen = new Set([p.barcode]);
+        const cands = [];
+        for (const x of raw) {
+            const prod = offToProduct(x);
+            const ns = String(x.nutriscore_grade).toUpperCase();
+            const n = norm(prod.name);
+            if (!prod.barcode || seen.has(prod.barcode) || !n || (cur && (n.includes(cur) || cur.includes(n))))
+                continue;
+            seen.add(prod.barcode);
+            // Besser als das gescannte Produkt; ohne eigenen Nutri-Score nur sehr gute Produkte (A/B).
+            if (curNs ? nsRank(ns) >= nsRank(curNs) : nsRank(ns) > 1)
+                continue;
+            prod.meta = {
+                analysis: x.ingredients_analysis_tags || []
+            };
+            // Ohne Zutatenangaben lässt sich nicht prüfen, ob es zum Profil passt → nicht vorschlagen.
+            if (needsIngredients && !prod._ingredients && !prod._allergenTags)
+                continue;
+            const fits = members.every(m => withMember(m, () => allergyMatches(prod).hits.length === 0 && !((dietStatus(prod) || {}).level === 'bad')));
+            if (fits)
+                cands.push({
+                    prod,
+                    ns
+                });
+        }
+        cands.sort((a, b) => nsRank(a.ns) - nsRank(b.ns));
+        return cands[0] || null;
+    }
+    function quickAltHtml(p) {
+        if (!p.barcode || !(p.categories || []).some(c => c.startsWith('en:')))
+            return '';
+        const raw = altCache[p.barcode];
+        if (raw === undefined)
+            return '<p class="altline muted">💡 Suche nach einer besseren Alternative …</p>';
+        if (raw === null)
+            return '<p class="altline muted">💡 Alternativen gerade nicht abrufbar (Datenbank ausgelastet). <button type="button" class="linkbtn" data-action="retryAlt">Erneut versuchen</button></p>';
+        const best = pickBetterAlternative(p, raw);
+        if (!best)
+            return p.meta && p.meta.nutriscore && nsRank(p.meta.nutriscore) <= 1 ? '' : '<p class="altline muted">💡 Keine passende bessere Alternative in der Datenbank gefunden.</p>';
+        return `<div class="altline"><span class="ns ns${best.ns} on mini">${best.ns}</span><span>💡 <strong>Besser:</strong> ${escapeHtml(best.prod.name)}${best.prod.brand ? ' <span class="muted">(' + escapeHtml(String(best.prod.brand).split(',')[0]) + ')</span>' : ''} <button type="button" class="linkbtn" data-action="moreAlternatives">mehr</button></span></div>`;
+    }
+    async function loadQuickAlternative(p) {
+        if (!p.barcode || altCache[p.barcode] !== undefined || !(p.categories || []).some(c => c.startsWith('en:')))
+            return;
+        const code = p.barcode;
+        try {
+            altCache[code] = await fetchAltCandidates(p);
+        } catch (e) {
+            altCache[code] = null;
+        }
+        if (getProduct().barcode === code && !$('quickBox').classList.contains('hidden'))
+            $('quickAlt').innerHTML = quickAltHtml(getProduct());
+    }
+
+    // Reihenfolge: Schnellübersicht (Urteil, Ampel, Chips, Alternative, Merken, Details eingeklappt) → Produktdaten.
     function showResult(p) {
         $('quickBox').classList.remove('hidden');
         $('moreDetails').classList.remove('hidden');
         $('quickAllergy').innerHTML = quickCardHtml(p);
         $('ampel').innerHTML = quickPrefs.ampel ? ampelHtml(p) : '';
         $('quickBadges').innerHTML = quickBadgesHtml(p);
+        $('quickAlt').innerHTML = quickAltHtml(p);
+        $('quickActions').innerHTML = shopButtonHtml(p);
         $('detailTop').innerHTML = familyBannersHtml(p) + topResultHtml(p);
         $('result').innerHTML = resultHtml(p);
         updatePerPack();
     }
     function hideQuickBox() {
         $('quickBox').classList.add('hidden');
-        for (const id of ['quickAllergy', 'ampel', 'quickBadges', 'detailTop', 'result'])
+        for (const id of ['quickAllergy', 'ampel', 'quickBadges', 'quickAlt', 'quickActions', 'detailTop', 'result'])
             $(id).innerHTML = '';
+        $('ocrStatus').textContent = '';
     }
 
     // Verlauf: die letzten 10 per Barcode geladenen Produkte, lokal auf dem Gerät gespeichert.
@@ -1993,6 +2416,7 @@
     }
     function fillForm(p) {
         $('barcode').value = p.barcode || '';
+        updateLookupButton();
         $('barcode').dataset.categories = JSON.stringify(p.categories || []);
         if (p.meta)
             $('barcode').dataset.meta = JSON.stringify(p.meta);
@@ -2023,6 +2447,7 @@
             setStatus('Aus dem Verlauf geladen: ' + h.name + ' (gespeicherte Daten, ohne Internet). Für aktuelle Daten „Produkt suchen“ tippen.');
             showResult(getProduct());
             collapseProductDetails();
+            loadQuickAlternative(getProduct());
         }
     });
     $('clearHistory').addEventListener('click', () => {
@@ -2057,6 +2482,7 @@
                 $(id).value = ''
         });
         $('barcode').value = '';
+        updateLookupButton();
         delete $('barcode').dataset.categories;
         delete $('barcode').dataset.meta;
         $('packUnit').value = 'g';
@@ -2132,6 +2558,7 @@
             tr = m.traceOk || [];
         $('allergenOptions').innerHTML = allergenNames.map(a => `<div class="allergenrow"><label class="prefrow"><input type="checkbox" data-allergen="${a}" ${al.includes(a) ? 'checked' : ''}> ${a}</label><label class="traceopt${al.includes(a) ? '' : ' off'}"><input type="checkbox" data-trace="${a}" ${tr.includes(a) ? 'checked' : ''} ${al.includes(a) ? '' : 'disabled'}> Spuren ok</label></div>`).join('');
         $('dietOptions').querySelectorAll('input').forEach(i => i.checked = !!(m.diet || {})[i.value]);
+        $('memberAge').value = m.age ?? '';
         $('saveProfile').textContent = 'Profil von ' + m.name + ' speichern';
     }
     // Auswahl "Prüfen für" im Tab "Produkt prüfen".
@@ -2212,6 +2639,8 @@
         const m = editMember();
         m.allergens = [...$('allergenOptions').querySelectorAll('input[data-allergen]:checked')].map(x => x.dataset.allergen);
         m.traceOk = [...$('allergenOptions').querySelectorAll('input[data-trace]:checked')].map(x => x.dataset.trace).filter(a => m.allergens.includes(a));
+        const age = val('memberAge');
+        m.age = age && age > 0 && age < 18 ? Math.round(age) : null;
         m.diet = {};
         $('dietOptions').querySelectorAll('input').forEach(i => m.diet[i.value] = i.checked);
         saveFamily();
@@ -2244,6 +2673,7 @@
         return null
     }
     async function lookupBarcode() {
+        updateLookupButton();
         const code = $('barcode').value.trim().replace(/\s/g, '');
         if (!/^\d{8,14}$/.test(code)) {
             setStatus('Bitte einen gültigen Barcode mit 8 bis 14 Ziffern eingeben.', true);
@@ -2278,6 +2708,7 @@
             const p = data.product,
                 n = p.nutriments || {};
             $('barcode').value = p.code || code;
+            updateLookupButton();
             $('barcode').dataset.categories = JSON.stringify(Array.isArray(p.categories_tags) ? p.categories_tags : []);
             $('barcode').dataset.meta = JSON.stringify(await offMeta(p));
             $('name').value = firstValue(p, ['product_name_de', 'product_name']) || 'Unbenanntes Produkt';
@@ -2302,6 +2733,7 @@
             const loaded = getProduct();
             showResult(loaded);
             collapseProductDetails();
+            loadQuickAlternative(loaded);
             addToHistory(loaded);
         } catch (e) {
             setStatus('Abruf fehlgeschlagen: ' + e.message + '. Du kannst den Barcode oder die Nährwerte manuell eingeben.', true)
@@ -2530,6 +2962,71 @@
             setStatus('Foto-Scan fehlgeschlagen: ' + e.message + '. Barcode bitte manuell eingeben.', true)
         } finally {
             $('photoScan').disabled = false
+        }
+    });
+    // ---------- Zutatenliste per Foto (Texterkennung) ----------
+    // Für Produkte ohne Datenbank-Eintrag: Tesseract.js liest die Zutatenliste direkt im Browser (nichts wird hochgeladen).
+    // Beim ersten Mal werden ca. 5 MB (Programm + deutsche Sprachdaten) geladen, danach kommt es aus dem Browser-Cache.
+    function loadTesseract() {
+        if (window.Tesseract)
+            return Promise.resolve(window.Tesseract);
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+            s.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('Texterkennung nicht verfügbar'));
+            s.onerror = () => reject(new Error('Texterkennung konnte nicht geladen werden (Internetverbindung?)'));
+            document.head.appendChild(s);
+        });
+    }
+    function ocrStatus(msg, isError) {
+        $('ocrStatus').textContent = msg;
+        $('ocrStatus').style.color = isError ? '#b42318' : 'var(--muted)';
+        setStatus(msg, isError);
+    }
+    document.addEventListener('click', e => {
+        if (e.target && e.target.dataset && e.target.dataset.action === 'ocrIngredients') {
+            $('ocrInput').value = '';
+            $('ocrInput').click();
+        }
+    });
+    $('ocrInput').addEventListener('change', async () => {
+        const file = $('ocrInput').files && $('ocrInput').files[0];
+        if (!file)
+            return;
+        $('productDetails').open = true;
+        $('ingredientsDetails').open = true;
+        try {
+            ocrStatus('Texterkennung wird geladen …');
+            const T = await loadTesseract();
+            const img = await loadImage(file);
+            // Etwas verkleinern: schneller und für Packungstext genau genug.
+            const canvas = drawScaled(img, 2000, false);
+            const worker = await T.createWorker('deu', 1, {
+                logger: m => {
+                    if (m.status === 'recognizing text')
+                        ocrStatus('Zutatenliste wird gelesen … ' + Math.round((m.progress || 0) * 100) + ' %');
+                }
+            });
+            const {
+                data
+            } = await worker.recognize(canvas);
+            await worker.terminate();
+            const text = String(data.text || '').replace(/-\s*\n\s*/g, '').replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+            if (text.length < 10) {
+                ocrStatus('Auf dem Foto wurde kaum Text erkannt. Tipp: Zutatenliste formatfüllend, gerade und scharf fotografieren.', true);
+                return
+            }
+            $('allergens').value = 'Zutaten (per Foto erkannt): ' + text;
+            if ($('name').value.trim() === '' && $('barcode').value.trim())
+                $('name').value = 'Produkt ' + $('barcode').value.trim();
+            ocrStatus('✓ Zutatenliste erkannt – bitte kurz mit der Verpackung vergleichen. Erkennungsfehler sind möglich.');
+            showResult(getProduct());
+            $('quickBox').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        } catch (e) {
+            ocrStatus('Texterkennung fehlgeschlagen: ' + e.message + '. Zutaten bitte von Hand eintragen.', true);
         }
     });
     // Live-Kamera geht nur über HTTPS (oder localhost). Sonst nur den Foto-Scan anbieten.
