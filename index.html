@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#176b52">
-    <title>FoodCheck 1.8.4 – Prototyp</title>
+    <title>FoodCheck 1.8.5 – Prototyp</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -709,6 +709,7 @@
                         <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
                     </div>
                     <video id="scannerVideo" class="hidden" playsinline style="width:100%;max-height:300px;border-radius:12px;background:#111;margin-top:8px"></video>
+                    <p id="scanStatus" class="muted">Datenquelle: Open Food Facts. Wenn die Kamera nicht unterstützt wird, Barcode manuell eingeben.</p>
                     <!-- Schnellübersicht: Urteil laut Profil + die in den Einstellungen gewählten Kennzahlen; Rest unter "Alle Details". -->
                     <div id="quickBox" class="quickbox hidden">
                         <div id="quickAllergy"></div>
@@ -720,7 +721,6 @@
                             <div id="result"></div>
                         </details>
                     </div>
-                    <p id="scanStatus" class="muted">Datenquelle: Open Food Facts. Wenn die Kamera nicht unterstützt wird, Barcode manuell eingeben.</p>
                 </div>
                 <details id="productDetails" class="full productdetails" open>
                     <summary id="productSummary">Produktdaten</summary>
@@ -844,7 +844,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">FoodCheck Version 1.8.4 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">FoodCheck Version 1.8.5 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
