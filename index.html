@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#293133">
-    <title>Pickwell 2.0.2 – Know better. Shop smarter.</title>
+    <title>Pickwell 2.0.3 – Know better. Shop smarter. Eat smarter.</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon-192.png" type="image/png">
     <link rel="apple-touch-icon" href="icon-180.png">
@@ -799,7 +799,7 @@
         <div class="headrow">
             <div>
                 <h1>🥬 Pickwell</h1>
-                <p>Know better. Shop smarter.</p>
+                <p>Know better. Shop smarter. Eat smarter.</p>
             </div>
             <button type="button" class="sharebtn" id="shareApp" aria-label="App teilen">📤 App teilen</button>
         </div>
@@ -997,7 +997,7 @@
                 <label class="prefrow"><input type="checkbox" value="eco"> Umwelt (Green-Score)</label>
             </div>
         </section>
-        <div class="footer">Pickwell Version 2.0.2 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
+        <div class="footer">Pickwell Version 2.0.3 · Produktdatenquelle: Open Food Facts. Daten und Bewertungen sind vorläufig; die aktuelle Verpackung ist maßgeblich. Keine medizinische Beratung.</div>
     </main>
     <script>
     const $ = id => document.getElementById(id);
@@ -3042,7 +3042,7 @@
     function appLink() {
         return location.origin + location.pathname.replace(/index\.html$/, '');
     }
-    const shareText = 'Probier mal Pickwell – Know better. Shop smarter. 🥬 Einfach den Barcode von Lebensmitteln scannen und sofort sehen: passt es zu Allergien und Vorlieben der Familie, Nutri-Score, Zucker, Salz, Fett und bessere Alternativen. Tipp: Auf dem iPhone in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Noch ein Prototyp – bei Allergien bitte immer die Verpackung prüfen.';
+    const shareText = 'Probier mal Pickwell – Know better. Shop smarter. Eat smarter. 🥬 Einfach den Barcode von Lebensmitteln scannen und sofort sehen: passt es zu Allergien und Vorlieben der Familie, Nutri-Score, Zucker, Salz, Fett und bessere Alternativen. Tipp: Auf dem iPhone in Safari öffnen → Teilen → „Zum Home-Bildschirm“. Noch ein Prototyp – bei Allergien bitte immer die Verpackung prüfen.';
     $('shareApp').addEventListener('click', async () => {
         const url = appLink();
         if (navigator.share) {
